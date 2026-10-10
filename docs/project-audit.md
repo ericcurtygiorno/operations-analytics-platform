@@ -32,7 +32,10 @@ means implemented and verified; `Pending` is intentionally not presented as comp
 
 ## Remaining closure sequence
 
-1. Record the walkthrough with the other portfolio videos during the final recording batch.
+1. Publish the optional interactive Power BI Service version during the final portfolio release.
+2. Record the walkthrough with the other portfolio videos during the final recording batch.
 
-The only intentionally deferred completion item is the 60–90 second walkthrough video. All other
-technical, documentation, publication, and showcase criteria are complete.
+The baseline's accessible-dashboard criterion is satisfied by the public static gallery. The
+interactive Power BI Service version is a deferred enhancement, not a hidden blocker. The only
+deferred mandatory completion item is the 60–90 second walkthrough video; all other technical,
+documentation, publication, and showcase criteria are complete.

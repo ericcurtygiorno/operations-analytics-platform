@@ -13,7 +13,8 @@ than it proves.
 - Airflow uses `standalone` and `LocalExecutor`; it demonstrates orchestration behavior but is not a
   production deployment topology.
 - Power BI refresh is local and depends on the PostgreSQL service at `localhost:55432`.
-- The static screenshot gallery is the portable report alternative until public hosting is chosen.
+- The static screenshot gallery is the current public report alternative. Interactive Power BI
+  Service publication is intentionally deferred to the final portfolio release.
 - Findings describe associations in generated data. They do not prove causality, savings, or a
   measured intervention effect.
 
@@ -35,5 +36,6 @@ than it proves.
    represent those behaviors honestly.
 3. Add service-level alerting only after a notification channel and operational ownership model are
    defined.
-4. Publish the static dashboard gallery with the repository and portfolio showcase.
-5. Record the 60–90 second walkthrough during the final cross-portfolio video batch.
+4. Publish the interactive Power BI Service version during the final portfolio release, using only
+   the project's synthetic data.
+5. Record the 60–90 second walkthrough during the same final cross-portfolio release batch.

@@ -37,8 +37,11 @@ Use the local credentials from `.env`. Never publish or screenshot the password.
 
 The deterministic report generator is [`build_dashboard.ps1`](build_dashboard.ps1). It recreates the five PBIR pages, visuals, bookmarks, navigation, filters, and theme.
 
-The publication-ready static gallery is stored in [`screenshots`](screenshots). Internal rendered
-validation captures are kept out of the public repository. Validation completed with:
+The publication-ready static gallery is stored in [`screenshots`](screenshots). Each image is
+cropped to the report canvas, without Power BI Desktop panes or external canvas glow. Internal
+rendered validation captures are kept out of the public repository. An interactive Power BI
+Service version is intentionally deferred to the final portfolio release, when the walkthrough
+videos and public links will be validated together. Validation completed with:
 
 - PBIR structural validation: 0 errors; after Desktop saved the report with schema 2.13.0, the offline validator reported one schema-endpoint reachability warning only;
 - semantic model validation: 8 tables, 100 measures, and 9 relationships;
