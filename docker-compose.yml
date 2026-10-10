@@ -1,0 +1,97 @@
+name: operations-analytics-platform
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_PORT:-55432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  pipeline:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+    working_dir: /app
+    volumes:
+      - ./:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command:
+      - /bin/sh
+      - -c
+      - >-
+        python -m src.operations_analytics.generator
+        --config config/generator.json --output sample_data
+        && python -m src.operations_analytics.ingestion
+        --input sample_data --env-file .env
+        && dbt build --profiles-dir dbt
+        && python -m src.operations_analytics.evidence
+        --env-file .env --run-results target/run_results.json
+        --output-dir artifacts/evidence --docs-dir docs
+    profiles:
+      - pipeline
+
+  airflow:
+    image: operations-analytics-platform-airflow:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow
+    env_file:
+      - .env
+    environment:
+      AIRFLOW_HOME: /opt/airflow/runtime
+      AIRFLOW__CORE__DAGS_FOLDER: /opt/project/orchestration/dags
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
+      OAP_PROJECT_ROOT: /opt/project
+      PIPELINE_PYTHON: /opt/pipeline-venv/bin/python
+      DBT_BINARY: /opt/pipeline-venv/bin/dbt
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+    working_dir: /opt/project
+    volumes:
+      - ./:/opt/project
+      - airflow_home:/opt/airflow/runtime
+    ports:
+      - "${AIRFLOW_PORT:-8080}:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: standalone
+    profiles:
+      - airflow
+
+  airflow-init:
+    image: operations-analytics-platform-airflow:latest
+    user: "0:0"
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - >-
+        mkdir -p /opt/airflow/runtime
+        && chown -R 50000:0 /opt/airflow/runtime
+    volumes:
+      - airflow_home:/opt/airflow/runtime
+    profiles:
+      - airflow
+
+volumes:
+  postgres_data:
+  airflow_home:

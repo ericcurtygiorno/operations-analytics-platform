@@ -1,0 +1,84 @@
+name: Project quality checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  python-dbt-integration:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: operations_analytics
+          POSTGRES_USER: analytics
+          POSTGRES_PASSWORD: ci-only-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U analytics -d operations_analytics"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: operations_analytics
+      POSTGRES_USER: analytics
+      POSTGRES_PASSWORD: ci-only-password
+      DBT_THREADS: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install project tooling
+        run: python -m pip install -e ".[analytics,dev]"
+      - name: Lint Python
+        run: ruff check src tests orchestration/dags
+      - name: Run Python tests
+        run: python -m unittest discover -s tests -v
+      - name: Generate deterministic sources
+        run: python -m src.operations_analytics.generator --config config/generator.json --output sample_data
+      - name: Load PostgreSQL raw layer
+        run: python -m src.operations_analytics.ingestion --input sample_data --env-file .env.example
+      - name: Build and test dbt models
+        run: dbt build --profiles-dir dbt
+      - name: Generate executable evidence
+        run: >-
+          python -m src.operations_analytics.evidence
+          --env-file .env.example
+          --run-results target/run_results.json
+          --output-dir artifacts/evidence
+          --docs-dir docs
+      - name: Validate Compose definition
+        run: docker compose --env-file .env.example --profile pipeline --profile airflow config --quiet
+      - name: Upload dbt and quality evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dbt-and-quality-evidence
+          path: |
+            target/run_results.json
+            artifacts/evidence/stage-1-3-evidence.json
+          if-no-files-found: warn
+
+  airflow-dag-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Airflow runtime
+        run: docker compose --env-file .env.example --profile airflow build airflow
+      - name: Initialize Airflow metadata volume
+        run: docker compose --env-file .env.example --profile airflow run --rm airflow-init
+      - name: Parse DAG without import errors
+        run: >-
+          docker compose --env-file .env.example --profile airflow run --rm --no-deps airflow
+          bash -c "airflow db migrate && airflow dags list-import-errors --output json && airflow dags list --output json"

@@ -1,0 +1,13 @@
+FROM apache/airflow:3.3.2-python3.11
+
+USER root
+RUN python -m venv /opt/pipeline-venv \
+    && chown -R airflow:root /opt/pipeline-venv
+
+USER airflow
+RUN /opt/pipeline-venv/bin/python -m pip install --no-cache-dir \
+    psycopg2-binary==2.9.13 \
+    dbt-core==1.12.5 \
+    dbt-postgres==1.11.0
+
+WORKDIR /opt/project
