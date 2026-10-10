@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: raw
+    description: Immutable source copies with ingestion lineage metadata.
+    tables:
+      - name: ingestion_batches
+        description: Audit log for immutable source loads; staging models consume the latest completed load.
+      - name: orders
+        description: Raw order rows exactly as received from the source CSV.
+        loaded_at_field: _ingested_at
+      - name: shipments
+        description: Raw shipment rows exactly as received from the source CSV.
+        loaded_at_field: _ingested_at
+      - name: delivery_events
+        description: Raw delivery events with both extracted fields and original JSON payload.
+        loaded_at_field: _ingested_at

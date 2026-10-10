@@ -1,0 +1,267 @@
+{
+  "database": {
+    "carrier_performance": [
+      {
+        "average_freight_per_shipment": 30.4,
+        "average_late_delay_days": 2.04,
+        "carrier_name": "BluePeak Logistics",
+        "exception_rate_pct": 56.63,
+        "on_time_delivery_rate_pct": 40.0,
+        "sla_eligible_shipments": 150,
+        "total_shipments": 166
+      },
+      {
+        "average_freight_per_shipment": 28.24,
+        "average_late_delay_days": 2.11,
+        "carrier_name": "Cedar Freight",
+        "exception_rate_pct": 51.89,
+        "on_time_delivery_rate_pct": 43.11,
+        "sla_eligible_shipments": 167,
+        "total_shipments": 185
+      },
+      {
+        "average_freight_per_shipment": 29.47,
+        "average_late_delay_days": 2.26,
+        "carrier_name": "Aurora Express",
+        "exception_rate_pct": 42.11,
+        "on_time_delivery_rate_pct": 50.92,
+        "sla_eligible_shipments": 163,
+        "total_shipments": 190
+      },
+      {
+        "average_freight_per_shipment": 29.1,
+        "average_late_delay_days": 2.22,
+        "carrier_name": "Delta Parcel",
+        "exception_rate_pct": 43.54,
+        "on_time_delivery_rate_pct": 54.01,
+        "sla_eligible_shipments": 187,
+        "total_shipments": 209
+      },
+      {
+        "average_freight_per_shipment": 22.79,
+        "average_late_delay_days": null,
+        "carrier_name": "Unknown Carrier",
+        "exception_rate_pct": 100.0,
+        "on_time_delivery_rate_pct": null,
+        "sla_eligible_shipments": 0,
+        "total_shipments": 6
+      }
+    ],
+    "distribution_center_performance": [
+      {
+        "average_order_to_ship_hours": 42.38,
+        "distribution_center_id": "DC-SAO",
+        "on_time_delivery_rate_pct": 45.89,
+        "sla_eligible_shipments": 207,
+        "total_shipments": 230
+      },
+      {
+        "average_order_to_ship_hours": 35.7,
+        "distribution_center_id": "DC-REC",
+        "on_time_delivery_rate_pct": 46.98,
+        "sla_eligible_shipments": 215,
+        "total_shipments": 242
+      },
+      {
+        "average_order_to_ship_hours": 39.49,
+        "distribution_center_id": "DC-CWB",
+        "on_time_delivery_rate_pct": 48.98,
+        "sla_eligible_shipments": 245,
+        "total_shipments": 272
+      },
+      {
+        "average_order_to_ship_hours": null,
+        "distribution_center_id": "Missing",
+        "on_time_delivery_rate_pct": null,
+        "sla_eligible_shipments": 0,
+        "total_shipments": 12
+      }
+    ],
+    "failure_reasons": [
+      {
+        "affected_shipments": 101,
+        "failure_reason": "capacity",
+        "share_of_exceptions_pct": 27.52
+      },
+      {
+        "affected_shipments": 97,
+        "failure_reason": "customer_unavailable",
+        "share_of_exceptions_pct": 26.43
+      },
+      {
+        "affected_shipments": 93,
+        "failure_reason": "weather",
+        "share_of_exceptions_pct": 25.34
+      },
+      {
+        "affected_shipments": 76,
+        "failure_reason": "address_issue",
+        "share_of_exceptions_pct": 20.71
+      }
+    ],
+    "latest_batch": [
+      {
+        "file_hashes": {
+          "delivery_events.jsonl": "32973175c585825d3e646ed1f5c7bf089d7e668e646ad2a234f4ef90244631ec",
+          "orders.csv": "ed11c71dd500d97970c7076d715930961789bac804a65e1d24da3d0a92225063",
+          "shipments.csv": "bd25ad3dde916695094387eadb9a681e4c84a27c168fc6c81f4b81da0c8902ab"
+        },
+        "load_id": "load-1c6d9fd905e89c0f",
+        "row_counts": {
+          "delivery_events": 1812,
+          "orders": 759,
+          "shipments": 756
+        },
+        "source_batch_id": "seed-20261006",
+        "status": "completed"
+      }
+    ],
+    "model_checks": [
+      {
+        "distinct_shipment_ids": 756,
+        "fact_rows": 756,
+        "invalid_rows_leaking_into_sla": 0,
+        "invalid_timelines_leaking_into_sla": 0
+      }
+    ],
+    "overview": [
+      {
+        "average_freight_per_shipment": 29.22,
+        "average_late_delay_days": 2.15,
+        "delivered_shipments": 701,
+        "exception_rate_pct": 48.54,
+        "first_attempt_success_pct": 80.46,
+        "first_promised_date": "2024-01-08",
+        "last_promised_date": "2025-07-06",
+        "on_time_deliveries": 316,
+        "on_time_delivery_rate_pct": 47.38,
+        "sla_eligible_shipments": 667,
+        "sla_excluded_shipments": 89,
+        "sla_exclusion_rate_pct": 11.77,
+        "total_shipments": 756
+      }
+    ],
+    "quality_flags": [
+      {
+        "affected_rows": 6,
+        "quality_rule": "delivered_without_timestamp"
+      },
+      {
+        "affected_rows": 6,
+        "quality_rule": "delivery_before_shipment"
+      },
+      {
+        "affected_rows": 18,
+        "quality_rule": "invalid_order"
+      },
+      {
+        "affected_rows": 12,
+        "quality_rule": "orphan_order"
+      },
+      {
+        "affected_rows": 6,
+        "quality_rule": "unknown_carrier"
+      }
+    ],
+    "regional_performance": [
+      {
+        "destination_region": "Central-West",
+        "exception_rate_pct": 55.21,
+        "on_time_delivery_rate_pct": 43.42,
+        "sla_eligible_shipments": 152,
+        "total_shipments": 163
+      },
+      {
+        "destination_region": "South",
+        "exception_rate_pct": 48.26,
+        "on_time_delivery_rate_pct": 45.66,
+        "sla_eligible_shipments": 173,
+        "total_shipments": 201
+      },
+      {
+        "destination_region": "Northeast",
+        "exception_rate_pct": 49.46,
+        "on_time_delivery_rate_pct": 46.3,
+        "sla_eligible_shipments": 162,
+        "total_shipments": 186
+      },
+      {
+        "destination_region": "Southeast",
+        "exception_rate_pct": 44.85,
+        "on_time_delivery_rate_pct": 53.33,
+        "sla_eligible_shipments": 180,
+        "total_shipments": 194
+      },
+      {
+        "destination_region": "Missing",
+        "exception_rate_pct": 8.33,
+        "on_time_delivery_rate_pct": null,
+        "sla_eligible_shipments": 0,
+        "total_shipments": 12
+      }
+    ],
+    "service_performance": [
+      {
+        "average_order_to_ship_hours": 38.11,
+        "average_ship_to_delivery_days": 3.11,
+        "on_time_delivery_rate_pct": 42.97,
+        "service_type": "express",
+        "sla_eligible_shipments": 128,
+        "total_shipments": 145
+      },
+      {
+        "average_order_to_ship_hours": 43.13,
+        "average_ship_to_delivery_days": 8.13,
+        "on_time_delivery_rate_pct": 45.77,
+        "service_type": "economy",
+        "sla_eligible_shipments": 142,
+        "total_shipments": 160
+      },
+      {
+        "average_order_to_ship_hours": 38.04,
+        "average_ship_to_delivery_days": 5.01,
+        "on_time_delivery_rate_pct": 49.37,
+        "service_type": "standard",
+        "sla_eligible_shipments": 397,
+        "total_shipments": 439
+      },
+      {
+        "average_order_to_ship_hours": null,
+        "average_ship_to_delivery_days": 4.45,
+        "on_time_delivery_rate_pct": null,
+        "service_type": "Missing",
+        "sla_eligible_shipments": 0,
+        "total_shipments": 12
+      }
+    ],
+    "year_comparison": [
+      {
+        "exception_rate_pct": 49.07,
+        "on_time_delivery_rate_pct": 46.28,
+        "sla_eligible_shipments": 417,
+        "total_shipments": 483,
+        "year": 2024
+      },
+      {
+        "exception_rate_pct": 47.62,
+        "on_time_delivery_rate_pct": 49.2,
+        "sla_eligible_shipments": 250,
+        "total_shipments": 273,
+        "year": 2025
+      }
+    ]
+  },
+  "dbt": {
+    "all_passed": true,
+    "generated_at": "2026-10-10T00:36:06.314626Z",
+    "resource_types": {
+      "model": 11,
+      "test": 40
+    },
+    "statuses": {
+      "pass": 40,
+      "success": 11
+    },
+    "total_nodes": 51
+  }
+}

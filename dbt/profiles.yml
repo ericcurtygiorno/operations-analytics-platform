@@ -1,0 +1,12 @@
+operations_analytics:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: "{{ env_var('POSTGRES_HOST', 'localhost') }}"
+      port: "{{ env_var('POSTGRES_PORT', '55432') | int }}"
+      dbname: "{{ env_var('POSTGRES_DB', 'operations_analytics') }}"
+      user: "{{ env_var('POSTGRES_USER', 'analytics') }}"
+      password: "{{ env_var('POSTGRES_PASSWORD') }}"
+      schema: analytics
+      threads: "{{ env_var('DBT_THREADS', '4') | int }}"

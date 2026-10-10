@@ -1,0 +1,27 @@
+{
+  "files": {
+    "delivery_events.jsonl": "32973175c585825d3e646ed1f5c7bf089d7e668e646ad2a234f4ef90244631ec",
+    "orders.csv": "ed11c71dd500d97970c7076d715930961789bac804a65e1d24da3d0a92225063",
+    "shipments.csv": "bd25ad3dde916695094387eadb9a681e4c84a27c168fc6c81f4b81da0c8902ab"
+  },
+  "generator_version": "0.1.0",
+  "injected_anomalies": {
+    "delivered_without_date": 6,
+    "delivery_before_shipment": 6,
+    "duplicate_order": 9,
+    "missing_order_id": 6,
+    "negative_quantity": 6,
+    "orphan_shipment": 6,
+    "unknown_carrier": 6
+  },
+  "period": {
+    "end_date": "2025-06-30",
+    "start_date": "2024-01-01"
+  },
+  "row_counts": {
+    "delivery_events": 1812,
+    "orders": 759,
+    "shipments": 756
+  },
+  "seed": 20261006
+}

@@ -1,0 +1,15 @@
+version: 2
+
+models:
+  - name: int_deliveries_enriched
+    description: One row per shipment enriched with order, lifecycle, SLA, and quality attributes.
+    columns:
+      - name: shipment_id
+        data_tests:
+          - unique
+          - not_null
+      - name: delivery_status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [in_transit, delivered]

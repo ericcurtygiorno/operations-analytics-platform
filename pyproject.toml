@@ -1,0 +1,24 @@
+[project]
+name = "operations-analytics-platform"
+version = "0.1.0"
+description = "Synthetic logistics analytics platform for a professional data portfolio"
+requires-python = ">=3.11"
+dependencies = [
+    "psycopg2-binary==2.9.13",
+]
+
+[project.optional-dependencies]
+analytics = [
+    "dbt-core==1.12.5",
+    "dbt-postgres==1.11.0",
+]
+dev = [
+    "ruff==0.17.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]

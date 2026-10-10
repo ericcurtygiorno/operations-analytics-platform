@@ -1,0 +1,109 @@
+version: 2
+
+models:
+  - name: fact_deliveries
+    description: One row per shipment, including eligible and quarantined-quality records.
+    columns:
+      - name: shipment_id
+        description: Natural shipment business key and fact grain.
+        data_tests:
+          - unique
+          - not_null
+      - name: carrier_key
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_carrier')
+                field: carrier_key
+      - name: customer_key
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_customer')
+                field: customer_key
+      - name: distribution_center_key
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_distribution_center')
+                field: distribution_center_key
+      - name: location_key
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_location')
+                field: location_key
+      - name: service_type_key
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_service_type')
+                field: service_type_key
+      - name: order_date_key
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+      - name: shipped_date_key
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+      - name: promised_delivery_date_key
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+      - name: delivered_date_key
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+      - name: delivery_status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [in_transit, delivered]
+
+  - name: dim_carrier
+    description: Carrier dimension including an explicitly flagged unknown source value.
+    columns:
+      - name: carrier_key
+        data_tests: [unique, not_null]
+
+  - name: dim_customer
+    description: Synthetic customer dimension without personally identifiable information.
+    columns:
+      - name: customer_key
+        data_tests: [unique, not_null]
+
+  - name: dim_distribution_center
+    description: Distribution center dimension.
+    columns:
+      - name: distribution_center_key
+        data_tests: [unique, not_null]
+
+  - name: dim_location
+    description: Destination region dimension.
+    columns:
+      - name: location_key
+        data_tests: [unique, not_null]
+
+  - name: dim_service_type
+    description: Delivery service type dimension.
+    columns:
+      - name: service_type_key
+        data_tests: [unique, not_null]
+
+  - name: dim_date
+    description: Daily calendar covering the complete operational period.
+    columns:
+      - name: date_key
+        data_tests: [unique, not_null]
+      - name: date_day
+        data_tests: [unique, not_null]

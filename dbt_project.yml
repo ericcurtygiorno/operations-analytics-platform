@@ -1,0 +1,22 @@
+name: operations_analytics
+version: 1.0.0
+config-version: 2
+
+profile: operations_analytics
+model-paths: ["dbt/models"]
+test-paths: ["dbt/tests"]
+macro-paths: ["dbt/macros"]
+target-path: "target"
+clean-targets: ["target", "dbt_packages"]
+
+models:
+  operations_analytics:
+    staging:
+      +schema: staging
+      +materialized: view
+    intermediate:
+      +schema: intermediate
+      +materialized: view
+    marts:
+      +schema: marts
+      +materialized: table

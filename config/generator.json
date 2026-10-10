@@ -1,0 +1,15 @@
+{
+  "seed": 20261006,
+  "start_date": "2024-01-01",
+  "end_date": "2025-06-30",
+  "order_count": 750,
+  "anomaly_counts": {
+    "duplicate_order": 9,
+    "missing_order_id": 6,
+    "negative_quantity": 6,
+    "unknown_carrier": 6,
+    "delivery_before_shipment": 6,
+    "delivered_without_date": 6,
+    "orphan_shipment": 6
+  }
+}

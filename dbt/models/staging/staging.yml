@@ -1,0 +1,42 @@
+version: 2
+
+models:
+  - name: stg_orders
+    description: Typed and deduplicated order records with explicit quality flags.
+    columns:
+      - name: order_id
+        data_tests:
+          - unique:
+              config:
+                where: "order_id is not null"
+      - name: service_type
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [express, standard, economy]
+
+  - name: stg_shipments
+    description: Typed shipment records with source-level anomaly flags.
+    columns:
+      - name: shipment_id
+        data_tests:
+          - unique
+          - not_null
+      - name: delivery_status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [in_transit, delivered]
+
+  - name: stg_delivery_events
+    description: Typed delivery lifecycle events retaining the original JSON payload.
+    columns:
+      - name: event_id
+        data_tests:
+          - unique
+          - not_null
+      - name: event_type
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [shipped, delivery_exception, delivered]
