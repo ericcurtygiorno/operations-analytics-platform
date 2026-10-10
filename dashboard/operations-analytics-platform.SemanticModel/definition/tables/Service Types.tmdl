@@ -1,0 +1,31 @@
+/// Service-level reference for comparing delivery products.
+table 'Service Types'
+	lineageTag: 9eee4828-b307-416f-8fdc-f221ad1e356e
+
+	/// Technical service-type relationship key.
+	column 'Service Type Key'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		lineageTag: 742f9fdd-2826-4e8f-bd0c-dcbbdf98e5d4
+		summarizeBy: none
+		sourceColumn: service_type_key
+
+	/// Commercial delivery service selected for the shipment.
+	column 'Service Type'
+		dataType: string
+		lineageTag: 32bdcfd7-8725-49db-b20b-e157cb03c069
+		summarizeBy: none
+		sourceColumn: service_type
+
+	partition 'marts dim_service_type' = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("localhost:55432", "operations_analytics"),
+				    ServiceTypeDimension = Source{[Schema="marts",Item="dim_service_type"]}[Data]
+				in
+				    ServiceTypeDimension
+
+	annotation PBI_ResultType = Table
+

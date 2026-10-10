@@ -1,0 +1,70 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/report/3.3.0/schema.json",
+  "themeCollection": {
+    "baseTheme": {
+      "reportVersionAtImport": {
+        "page": "2.3.1",
+        "report": "3.4.0",
+        "visual": "2.13.0"
+      },
+      "name": "Fluent2-CY26SU09",
+      "type": "SharedResources"
+    },
+    "customTheme": {
+      "reportVersionAtImport": {
+        "page": "2.3.1",
+        "report": "3.4.0",
+        "visual": "2.13.0"
+      },
+      "name": "NorthstarCommerce-c26a1006.json",
+      "type": "RegisteredResources"
+    }
+  },
+  "objects": {
+    "section": [
+      {
+        "properties": {
+          "verticalAlignment": {
+            "expr": {
+              "Literal": {
+                "Value": "'Top'"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "resourcePackages": [
+    {
+      "name": "SharedResources",
+      "items": [
+        {
+          "name": "Fluent2-CY26SU09",
+          "path": "BaseThemes/Fluent2-CY26SU09.json",
+          "type": "BaseTheme"
+        }
+      ],
+      "type": "SharedResources"
+    },
+    {
+      "name": "RegisteredResources",
+      "items": [
+        {
+          "name": "NorthstarCommerce-c26a1006.json",
+          "path": "NorthstarCommerce-c26a1006.json",
+          "type": "CustomTheme"
+        }
+      ],
+      "type": "RegisteredResources"
+    }
+  ],
+  "settings": {
+    "defaultDrillFilterOtherVisuals": true,
+    "useStylableVisualContainerHeader": true,
+    "useEnhancedTooltips": true,
+    "useDefaultAggregateDisplayName": true,
+    "allowChangeFilterTypes": true,
+    "exportDataMode": "AllowSummarized"
+  }
+}

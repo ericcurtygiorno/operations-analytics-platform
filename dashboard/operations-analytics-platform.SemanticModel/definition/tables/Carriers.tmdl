@@ -1,0 +1,40 @@
+/// Carrier reference used to compare service-level performance.
+table Carriers
+	lineageTag: 77a5e76c-9e0e-4b64-9b60-07b3ba470e5d
+
+	/// Technical carrier relationship key.
+	column 'Carrier Key'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		lineageTag: 846bc0d1-a63a-4040-bc4f-b1677dd82014
+		summarizeBy: none
+		sourceColumn: carrier_key
+
+	/// Business-facing carrier name.
+	column Carrier
+		dataType: string
+		lineageTag: 9ee3c89e-b559-40e2-9fab-0035f5b47b82
+		summarizeBy: none
+		sourceColumn: carrier_name
+
+	/// Identifies the governed unknown-member record.
+	column 'Is Unknown Carrier'
+		dataType: boolean
+		isHidden
+		isAvailableInMdx: false
+		lineageTag: 33cfea5d-4bf0-4c31-908e-8884cce85c93
+		summarizeBy: none
+		sourceColumn: is_unknown_carrier
+
+	partition 'marts dim_carrier' = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("localhost:55432", "operations_analytics"),
+				    CarrierDimension = Source{[Schema="marts",Item="dim_carrier"]}[Data]
+				in
+				    CarrierDimension
+
+	annotation PBI_ResultType = Table
+

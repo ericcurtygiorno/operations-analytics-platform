@@ -1,0 +1,47 @@
+{
+  "name": "NorthstarCommerce-c26a1006.json",
+  "dataColors": [
+    "#36CFC9",
+    "#62A7FF",
+    "#8B7CFF",
+    "#FFB547",
+    "#FF7A8A",
+    "#A9E34B",
+    "#F5F7FA"
+  ],
+  "foreground": "#DDE6F2",
+  "foregroundNeutralSecondary": "#9FB0C7",
+  "foregroundNeutralTertiary": "#667892",
+  "background": "#111B2E",
+  "backgroundLight": "#152137",
+  "backgroundNeutral": "#1B2A43",
+  "tableAccent": "#36CFC9",
+  "good": "#36CFC9",
+  "neutral": "#FFB547",
+  "bad": "#FF7A8A",
+  "maximum": "#36CFC9",
+  "center": "#FFB547",
+  "minimum": "#FF7A8A",
+  "textClasses": {
+    "header": {
+      "color": "#DDE6F2",
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 11
+    },
+    "callout": {
+      "color": "#F5F7FA",
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 28
+    },
+    "title": {
+      "color": "#F5F7FA",
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 14
+    },
+    "label": {
+      "color": "#DDE6F2",
+      "fontFace": "Segoe UI",
+      "fontSize": 10
+    }
+  }
+}

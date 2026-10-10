@@ -1,0 +1,31 @@
+/// Destination geography used for regional service analysis.
+table Locations
+	lineageTag: b011ab49-a64a-42e1-ac27-71f7975d79d2
+
+	/// Technical location relationship key.
+	column 'Location Key'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		lineageTag: 5da23784-e908-4175-b020-ca1398b6706b
+		summarizeBy: none
+		sourceColumn: location_key
+
+	/// Destination region assigned to the shipment.
+	column Region
+		dataType: string
+		lineageTag: 62a26503-dae1-4760-ac0e-baecf789874a
+		summarizeBy: none
+		sourceColumn: destination_region
+
+	partition 'marts dim_location' = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("localhost:55432", "operations_analytics"),
+				    LocationDimension = Source{[Schema="marts",Item="dim_location"]}[Data]
+				in
+				    LocationDimension
+
+	annotation PBI_ResultType = Table
+

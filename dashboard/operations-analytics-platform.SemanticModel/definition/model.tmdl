@@ -1,0 +1,27 @@
+model Model
+	culture: pt-BR
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	discourageImplicitMeasures
+	sourceQueryCulture: pt-BR
+	valueFilterBehavior: independent
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_QueryOrder = ["Carriers","Customers","Dates","Distribution Centers","Locations","Service Types","Deliveries"]
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table _Measures
+ref table Carriers
+ref table Customers
+ref table Dates
+ref table 'Distribution Centers'
+ref table Locations
+ref table 'Service Types'
+ref table Deliveries
+
+ref cultureInfo pt-BR
+

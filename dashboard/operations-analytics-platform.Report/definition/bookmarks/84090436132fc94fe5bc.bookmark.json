@@ -1,0 +1,24 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmark/2.1.0/schema.json",
+  "displayName": "Reset — Carriers & Regions",
+  "name": "84090436132fc94fe5bc",
+  "options": {
+    "targetVisualNames": [],
+    "suppressDisplay": true
+  },
+  "explorationState": {
+    "version": "1.0",
+    "activeSection": "78bc19ec1e40cdd583e4",
+    "filters": {
+      "byExpr": []
+    },
+    "sections": {
+      "78bc19ec1e40cdd583e4": {
+        "filters": {
+          "byExpr": []
+        },
+        "visualContainers": {}
+      }
+    }
+  }
+}

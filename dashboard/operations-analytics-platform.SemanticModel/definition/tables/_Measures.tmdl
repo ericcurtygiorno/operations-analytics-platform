@@ -1,0 +1,1706 @@
+/// Central catalogue of governed KPIs used throughout the operations dashboard.
+table _Measures
+	lineageTag: 0962ef8d-a385-4265-8152-621480b1cbf2
+
+	/// Distinct shipments in the current filter context.
+	measure 'Total Shipments' = DISTINCTCOUNT ( Deliveries[Shipment ID] )
+		formatString: #,##0
+		displayFolder: 01. Volume
+		lineageTag: e06846e7-8a75-48e4-9e8e-ca58fccf01da
+
+	/// Shipments whose latest operational status is delivered.
+	measure 'Delivered Shipments' =
+			CALCULATE (
+				[Total Shipments],
+				KEEPFILTERS ( Deliveries[Delivery Status] = "delivered" )
+			)
+		formatString: #,##0
+		displayFolder: 01. Volume
+		lineageTag: 5ab44014-9cff-4ba0-9090-2c42cb831121
+
+	/// Shipments still moving through the delivery network.
+	measure 'Open Shipments' =
+			CALCULATE (
+				[Total Shipments],
+				KEEPFILTERS ( Deliveries[Delivery Status] = "in_transit" )
+			)
+		formatString: #,##0
+		displayFolder: 01. Volume
+		lineageTag: 951a09f5-3164-4fe6-9b38-cfcd2f05a729
+
+	/// Shipments that passed all quality rules required for SLA evaluation.
+	measure 'SLA Eligible Shipments' =
+			CALCULATE (
+				[Total Shipments],
+				KEEPFILTERS ( Deliveries[Is Valid for SLA] = TRUE () )
+			)
+		formatString: #,##0
+		displayFolder: 02. Service Level
+		lineageTag: 481aa401-9d53-40ca-be95-38246d432886
+
+	/// SLA-eligible shipments delivered on or before the promised date.
+	measure 'On-Time Deliveries' =
+			CALCULATE (
+				[Total Shipments],
+				KEEPFILTERS ( Deliveries[Is Valid for SLA] = TRUE () ),
+				KEEPFILTERS ( Deliveries[Is On Time] = TRUE () )
+			)
+		formatString: #,##0
+		displayFolder: 02. Service Level
+		lineageTag: 841cf135-5815-47df-815d-818b2284be1a
+
+	/// SLA-eligible shipments delivered after the promised date.
+	measure 'Late Deliveries' =
+			CALCULATE (
+				[Total Shipments],
+				KEEPFILTERS ( Deliveries[Is Valid for SLA] = TRUE () ),
+				KEEPFILTERS ( Deliveries[Is On Time] = FALSE () )
+			)
+		formatString: #,##0
+		displayFolder: 02. Service Level
+		lineageTag: ffc7797b-1854-490e-b4f5-5d506796ff53
+
+	/// Share of SLA-eligible shipments delivered on time. Excluded records never enter the denominator.
+	measure 'On-Time Delivery Rate' =
+			DIVIDE (
+				[On-Time Deliveries],
+				[SLA Eligible Shipments]
+			)
+		formatString: 0.0%
+		displayFolder: 02. Service Level
+		lineageTag: 58ab032a-d693-4875-9322-de8b64542e3c
+
+	/// Average positive delay, in days, among late SLA-eligible deliveries.
+	measure 'Average Delay (Late)' =
+			CALCULATE (
+				AVERAGE ( Deliveries[Delivery Delay Days] ),
+				KEEPFILTERS ( Deliveries[Is Valid for SLA] = TRUE () ),
+				KEEPFILTERS ( Deliveries[Is On Time] = FALSE () )
+			)
+		formatString: #,##0.0
+		displayFolder: 02. Service Level
+		lineageTag: bd1468a8-118e-4372-ae83-668057d0fd46
+
+	/// 90th percentile of positive delivery delay among late SLA-eligible shipments.
+	measure 'P90 Delivery Delay' =
+			CALCULATE (
+				PERCENTILEX.INC (
+					Deliveries,
+					Deliveries[Delivery Delay Days],
+					0.9
+				),
+				KEEPFILTERS ( Deliveries[Is Valid for SLA] = TRUE () ),
+				KEEPFILTERS ( Deliveries[Is On Time] = FALSE () )
+			)
+		formatString: #,##0.0
+		displayFolder: 02. Service Level
+		lineageTag: 0f245fae-6013-460f-8ecd-d171fe042f1d
+
+	/// Average elapsed hours from order placement to shipment dispatch.
+	measure 'Average Order-to-Ship Hours' = AVERAGE ( Deliveries[Order-to-Ship Hours] )
+		formatString: #,##0.0
+		displayFolder: 03. Cycle Time
+		lineageTag: fe69eeb7-8482-45ae-aaa6-484cec5f6a04
+
+	/// Average elapsed days from shipment dispatch to delivery.
+	measure 'Average Ship-to-Delivery Days' =
+			DIVIDE (
+				AVERAGE ( Deliveries[Ship-to-Delivery Hours] ),
+				24
+			)
+		formatString: #,##0.0
+		displayFolder: 03. Cycle Time
+		lineageTag: 150b24be-4d90-4922-a04b-68b5d45fa148
+
+	/// Delivered shipments completed on the first attempt.
+	measure 'First-Attempt Deliveries' =
+			CALCULATE (
+				[Total Shipments],
+				KEEPFILTERS ( Deliveries[Delivery Status] = "delivered" ),
+				KEEPFILTERS ( Deliveries[Delivery Attempts] = 1 )
+			)
+		formatString: #,##0
+		displayFolder: 04. Attempts & Exceptions
+		lineageTag: 48b54c6d-12e6-421e-acee-a2bea83013cf
+
+	/// Share of delivered shipments completed on the first attempt.
+	measure 'First-Attempt Success Rate' =
+			DIVIDE (
+				[First-Attempt Deliveries],
+				[Delivered Shipments]
+			)
+		formatString: 0.0%
+		displayFolder: 04. Attempts & Exceptions
+		lineageTag: 5894e9af-3b36-4521-9ec9-928f4a2cff0e
+
+	/// Shipments with at least one recorded exception event.
+	measure 'Shipments with Exceptions' =
+			CALCULATE (
+				[Total Shipments],
+				KEEPFILTERS ( Deliveries[Exception Count] > 0 )
+			)
+		formatString: #,##0
+		displayFolder: 04. Attempts & Exceptions
+		lineageTag: 18c0c10b-8158-4279-9225-d081f43e62b7
+
+	/// Share of shipments with at least one recorded exception event.
+	measure 'Exception Rate' =
+			DIVIDE (
+				[Shipments with Exceptions],
+				[Total Shipments]
+			)
+		formatString: 0.0%
+		displayFolder: 04. Attempts & Exceptions
+		lineageTag: 2302ed1f-e1f0-4237-ab67-ddaad3bcdd31
+
+	/// Sum of all recorded delivery attempts.
+	measure 'Total Delivery Attempts' = SUM ( Deliveries[Delivery Attempts] )
+		formatString: #,##0
+		displayFolder: 04. Attempts & Exceptions
+		lineageTag: c23573f0-643f-40b2-9938-c2ad13137fa9
+
+	/// Total freight amount for shipments in the current filter context.
+	measure 'Total Freight Amount' = SUM ( Deliveries[Freight Amount] )
+		formatString: "R$" #,##0.00
+		displayFolder: 05. Cost & Volume
+		lineageTag: 7f1d624d-d5fa-4076-b967-dc21888e788e
+
+	/// Average freight amount per shipment.
+	measure 'Average Freight per Shipment' =
+			DIVIDE (
+				[Total Freight Amount],
+				[Total Shipments]
+			)
+		formatString: "R$" #,##0.00
+		displayFolder: 05. Cost & Volume
+		lineageTag: 0eb099dc-b589-4e01-aeae-316657554ab5
+
+	/// Total shipped weight in kilograms.
+	measure 'Total Weight (kg)' = SUM ( Deliveries[Weight (kg)] )
+		formatString: #,##0.0
+		displayFolder: 05. Cost & Volume
+		lineageTag: 6a40bbfc-0f28-4d6c-b8d9-1abdcde41c80
+
+	/// Total number of units represented by the shipments.
+	measure 'Total Units' = SUM ( Deliveries[Quantity] )
+		formatString: #,##0
+		displayFolder: 05. Cost & Volume
+		lineageTag: be762d62-1770-443a-bdf7-1ba7a03527d0
+
+	/// Shipments removed from SLA calculations by governed quality rules.
+	measure 'Excluded from SLA' =
+			CALCULATE (
+				[Total Shipments],
+				KEEPFILTERS ( Deliveries[Is Valid for SLA] = FALSE () )
+			)
+		formatString: #,##0
+		displayFolder: 06. Data Quality
+		lineageTag: 644cfd8e-95d7-481a-b129-ce7cd3fec8a3
+
+	/// Share of shipments excluded from SLA calculations.
+	measure 'SLA Exclusion Rate' =
+			DIVIDE (
+				[Excluded from SLA],
+				[Total Shipments]
+			)
+		formatString: 0.0%
+		displayFolder: 06. Data Quality
+		lineageTag: a27f009a-83dd-40b4-9adb-cc9a548dbf3d
+
+	/// Shipments whose source order could not be matched.
+	measure 'Orphan Shipments' =
+			CALCULATE (
+				[Total Shipments],
+				KEEPFILTERS ( Deliveries[Is Orphan Order] = TRUE () )
+			)
+		formatString: #,##0
+		displayFolder: 06. Data Quality
+		lineageTag: 79124f1e-eafa-4251-bb18-79d2ba57dd7e
+
+	/// Shipments assigned to an unknown carrier member.
+	measure 'Unknown Carrier Shipments' =
+			CALCULATE (
+				[Total Shipments],
+				KEEPFILTERS ( Deliveries[Is Unknown Carrier] = TRUE () )
+			)
+		formatString: #,##0
+		displayFolder: 06. Data Quality
+		lineageTag: 6fc1c632-44d6-48e0-8f71-4354b3aae06e
+
+	/// Shipments whose delivered timestamp occurs before the shipped timestamp.
+	measure 'Invalid Timeline Shipments' =
+			CALCULATE (
+				[Total Shipments],
+				KEEPFILTERS ( Deliveries[Is Delivery Before Shipment] = TRUE () )
+			)
+		formatString: #,##0
+		displayFolder: 06. Data Quality
+		lineageTag: 634e991c-bfd7-4896-bd83-0da7fc31f689
+
+	/// Delivered shipments that do not have a delivery timestamp.
+	measure 'Delivered Without Timestamp' =
+			CALCULATE (
+				[Total Shipments],
+				KEEPFILTERS ( Deliveries[Is Delivered Without Timestamp] = TRUE () )
+			)
+		formatString: #,##0
+		displayFolder: 06. Data Quality
+		lineageTag: 88117e0c-0969-43df-99f2-867d36a81f8b
+
+	/// Shipments containing one or more material data-quality defects.
+	measure 'Shipments with Data Quality Issues' =
+			CALCULATE (
+				[Total Shipments],
+				FILTER (
+					Deliveries,
+					Deliveries[Is Orphan Order]
+						|| Deliveries[Is Unknown Carrier]
+						|| Deliveries[Is Delivery Before Shipment]
+						|| Deliveries[Is Delivered Without Timestamp]
+						|| Deliveries[Has Invalid Order]
+				)
+			)
+		formatString: #,##0
+		displayFolder: 06. Data Quality
+		lineageTag: a085fe89-5f30-40d9-b317-ef4187b69c53
+
+	/// On-time delivery rate for the immediately preceding calendar month.
+	measure 'On-Time Delivery Rate Previous Month' =
+			CALCULATE (
+				[On-Time Delivery Rate],
+				PREVIOUSMONTH ( Dates[Date] )
+			)
+		formatString: 0.0%
+		displayFolder: 07. Time Intelligence
+		lineageTag: 86af79b7-0573-452f-8246-41be2585f89a
+
+	/// Percentage-point movement in on-time delivery rate versus the previous month.
+	measure 'On-Time Delivery MoM (pp)' =
+			VAR _CurrentRate =
+				[On-Time Delivery Rate]
+			VAR _PreviousRate =
+				[On-Time Delivery Rate Previous Month]
+			RETURN
+				IF (
+					NOT ISBLANK ( _PreviousRate ),
+					( _CurrentRate - _PreviousRate ) * 100
+				)
+		formatString: +0.0;-0.0;0.0
+		displayFolder: 07. Time Intelligence
+		lineageTag: b187a69a-6352-476f-b8af-399f3c34980c
+
+	/// Shipment volume for the immediately preceding calendar month.
+	measure 'Shipments Previous Month' =
+			CALCULATE (
+				[Total Shipments],
+				PREVIOUSMONTH ( Dates[Date] )
+			)
+		formatString: #,##0
+		displayFolder: 07. Time Intelligence
+		lineageTag: cac88b20-72f2-41f2-9b16-3f71cd1aa4a4
+
+	/// Percentage change in shipment volume versus the previous month.
+	measure 'Shipments MoM' =
+			VAR _PreviousShipments =
+				[Shipments Previous Month]
+			RETURN
+				DIVIDE (
+					[Total Shipments] - _PreviousShipments,
+					_PreviousShipments
+				)
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 07. Time Intelligence
+		lineageTag: 539e0c35-1cdb-45a2-a5fe-c630993ed8e0
+
+	/// On-Time Delivery Rate for the latest year in the model, preserving month and business filters.
+	measure 'On-Time Delivery Rate | Current YTD' =
+			VAR _SelectedYear =
+				SELECTEDVALUE ( Dates[Year] )
+			VAR _CurrentYear =
+				COALESCE (
+					_SelectedYear,
+					CALCULATE (
+						MAX ( Dates[Year] ),
+						REMOVEFILTERS ( Dates )
+					)
+				)
+			RETURN
+				CALCULATE (
+					[On-Time Delivery Rate],
+					REMOVEFILTERS ( Dates[Year] ),
+					Dates[Year] = _CurrentYear
+				)
+		formatString: 0.0%
+		displayFolder: 08. KPI Comparisons\On-Time Delivery Rate
+		lineageTag: 47de18da-dacf-4408-9db7-474a5f6286a0
+
+	/// On-Time Delivery Rate for the prior year using the same selected months, or Jan through the latest current-year month.
+	measure 'On-Time Delivery Rate | Prior YTD' =
+			VAR _SelectedYear =
+				SELECTEDVALUE ( Dates[Year] )
+			VAR _CurrentYear =
+				COALESCE (
+					_SelectedYear,
+					CALCULATE (
+						MAX ( Dates[Year] ),
+						REMOVEFILTERS ( Dates )
+					)
+				)
+			VAR _CurrentMaxMonth =
+				MONTH (
+					CALCULATE (
+						MAX ( Dates[Date] ),
+						REMOVEFILTERS ( Dates ),
+						Dates[Year] = _CurrentYear
+					)
+				)
+			VAR _HasMonthFilter =
+				ISFILTERED ( Dates[Month] )
+					|| ISFILTERED ( Dates[Month Number] )
+			RETURN
+				IF (
+					_HasMonthFilter,
+					CALCULATE (
+						[On-Time Delivery Rate],
+						REMOVEFILTERS ( Dates[Year] ),
+						Dates[Year] = _CurrentYear - 1
+					),
+					CALCULATE (
+						[On-Time Delivery Rate],
+						REMOVEFILTERS ( Dates[Year] ),
+						Dates[Year] = _CurrentYear - 1,
+						KEEPFILTERS ( Dates[Month Number] <= _CurrentMaxMonth )
+					)
+				)
+		formatString: 0.0%
+		displayFolder: 08. KPI Comparisons\On-Time Delivery Rate
+		lineageTag: f1838a24-704d-48ac-bf85-108368e550f9
+
+	/// Year-over-year change for On-Time Delivery Rate in percentage points.
+	measure 'On-Time Delivery Rate | YoY' =
+			VAR _CurrentValue =
+				[On-Time Delivery Rate | Current YTD]
+			VAR _PriorValue =
+				[On-Time Delivery Rate | Prior YTD]
+			RETURN
+				( _CurrentValue - _PriorValue ) * 100
+		formatString: +0.0 "pp";-0.0 "pp";0.0 "pp"
+		displayFolder: 08. KPI Comparisons\On-Time Delivery Rate
+		lineageTag: 62845454-1db5-4b36-9269-c9ce90d4f474
+
+	/// Business definition displayed in report tooltips.
+	measure 'On-Time Delivery Rate | Definition' = "On-time deliveries divided by SLA-eligible shipments. Records that fail governed data-quality rules are excluded from the denominator. When one year is selected, it is the current period; with multiple years selected, the latest year is current. Prior YTD uses the same selected months from the preceding year."
+		displayFolder: 08. KPI Comparisons\On-Time Delivery Rate
+		lineageTag: b807935e-ea21-4174-abd7-c8be53f4cbed
+
+	/// Total Shipments for the latest year in the model, preserving month and business filters.
+	measure 'Total Shipments | Current YTD' =
+			VAR _SelectedYear =
+				SELECTEDVALUE ( Dates[Year] )
+			VAR _CurrentYear =
+				COALESCE (
+					_SelectedYear,
+					CALCULATE (
+						MAX ( Dates[Year] ),
+						REMOVEFILTERS ( Dates )
+					)
+				)
+			RETURN
+				CALCULATE (
+					[Total Shipments],
+					REMOVEFILTERS ( Dates[Year] ),
+					Dates[Year] = _CurrentYear
+				)
+		formatString: #,##0
+		displayFolder: 08. KPI Comparisons\Total Shipments
+		lineageTag: a0ee1ac3-c294-4291-8353-97593a8cc830
+
+	/// Total Shipments for the prior year using the same selected months, or Jan through the latest current-year month.
+	measure 'Total Shipments | Prior YTD' =
+			VAR _SelectedYear =
+				SELECTEDVALUE ( Dates[Year] )
+			VAR _CurrentYear =
+				COALESCE (
+					_SelectedYear,
+					CALCULATE (
+						MAX ( Dates[Year] ),
+						REMOVEFILTERS ( Dates )
+					)
+				)
+			VAR _CurrentMaxMonth =
+				MONTH (
+					CALCULATE (
+						MAX ( Dates[Date] ),
+						REMOVEFILTERS ( Dates ),
+						Dates[Year] = _CurrentYear
+					)
+				)
+			VAR _HasMonthFilter =
+				ISFILTERED ( Dates[Month] )
+					|| ISFILTERED ( Dates[Month Number] )
+			RETURN
+				IF (
+					_HasMonthFilter,
+					CALCULATE (
+						[Total Shipments],
+						REMOVEFILTERS ( Dates[Year] ),
+						Dates[Year] = _CurrentYear - 1
+					),
+					CALCULATE (
+						[Total Shipments],
+						REMOVEFILTERS ( Dates[Year] ),
+						Dates[Year] = _CurrentYear - 1,
+						KEEPFILTERS ( Dates[Month Number] <= _CurrentMaxMonth )
+					)
+				)
+		formatString: #,##0
+		displayFolder: 08. KPI Comparisons\Total Shipments
+		lineageTag: 974f885b-1d98-4b3a-aa20-b890ea0a3f43
+
+	/// Year-over-year change for Total Shipments.
+	measure 'Total Shipments | YoY' =
+			VAR _CurrentValue =
+				[Total Shipments | Current YTD]
+			VAR _PriorValue =
+				[Total Shipments | Prior YTD]
+			RETURN
+				DIVIDE ( _CurrentValue - _PriorValue, _PriorValue )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 08. KPI Comparisons\Total Shipments
+		lineageTag: 71c88080-e8a0-45fa-9e68-10fc31a4127d
+
+	/// Business definition displayed in report tooltips.
+	measure 'Total Shipments | Definition' = "Distinct shipments in the selected business context. When one year is selected, it is the current period; with multiple years selected, the latest year is current. Prior YTD uses the same selected months from the preceding year."
+		displayFolder: 08. KPI Comparisons\Total Shipments
+		lineageTag: f52a9186-ea0d-4c5e-8f09-527ffabf25ea
+
+	/// Average Delay (Late) for the latest year in the model, preserving month and business filters.
+	measure 'Average Delay (Late) | Current YTD' =
+			VAR _SelectedYear =
+				SELECTEDVALUE ( Dates[Year] )
+			VAR _CurrentYear =
+				COALESCE (
+					_SelectedYear,
+					CALCULATE (
+						MAX ( Dates[Year] ),
+						REMOVEFILTERS ( Dates )
+					)
+				)
+			RETURN
+				CALCULATE (
+					[Average Delay (Late)],
+					REMOVEFILTERS ( Dates[Year] ),
+					Dates[Year] = _CurrentYear
+				)
+		formatString: #,##0.0
+		displayFolder: 08. KPI Comparisons\Average Delay (Late)
+		lineageTag: 465c4764-ca7d-4c6e-9fbd-b0eeb95d567d
+
+	/// Average Delay (Late) for the prior year using the same selected months, or Jan through the latest current-year month.
+	measure 'Average Delay (Late) | Prior YTD' =
+			VAR _SelectedYear =
+				SELECTEDVALUE ( Dates[Year] )
+			VAR _CurrentYear =
+				COALESCE (
+					_SelectedYear,
+					CALCULATE (
+						MAX ( Dates[Year] ),
+						REMOVEFILTERS ( Dates )
+					)
+				)
+			VAR _CurrentMaxMonth =
+				MONTH (
+					CALCULATE (
+						MAX ( Dates[Date] ),
+						REMOVEFILTERS ( Dates ),
+						Dates[Year] = _CurrentYear
+					)
+				)
+			VAR _HasMonthFilter =
+				ISFILTERED ( Dates[Month] )
+					|| ISFILTERED ( Dates[Month Number] )
+			RETURN
+				IF (
+					_HasMonthFilter,
+					CALCULATE (
+						[Average Delay (Late)],
+						REMOVEFILTERS ( Dates[Year] ),
+						Dates[Year] = _CurrentYear - 1
+					),
+					CALCULATE (
+						[Average Delay (Late)],
+						REMOVEFILTERS ( Dates[Year] ),
+						Dates[Year] = _CurrentYear - 1,
+						KEEPFILTERS ( Dates[Month Number] <= _CurrentMaxMonth )
+					)
+				)
+		formatString: #,##0.0
+		displayFolder: 08. KPI Comparisons\Average Delay (Late)
+		lineageTag: 185ec851-b96e-4012-bf2b-d5c2923993a4
+
+	/// Year-over-year change for Average Delay (Late).
+	measure 'Average Delay (Late) | YoY' =
+			VAR _CurrentValue =
+				[Average Delay (Late) | Current YTD]
+			VAR _PriorValue =
+				[Average Delay (Late) | Prior YTD]
+			RETURN
+				DIVIDE ( _CurrentValue - _PriorValue, _PriorValue )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 08. KPI Comparisons\Average Delay (Late)
+		lineageTag: d973a384-3d23-4897-95d6-a53beb89e2e9
+
+	/// Business definition displayed in report tooltips.
+	measure 'Average Delay (Late) | Definition' = "Average positive delivery delay in days among late, SLA-eligible deliveries only. When one year is selected, it is the current period; with multiple years selected, the latest year is current. Prior YTD uses the same selected months from the preceding year."
+		displayFolder: 08. KPI Comparisons\Average Delay (Late)
+		lineageTag: 4e2d1936-b49d-4c70-9ba0-1b7a73071145
+
+	/// SLA Exclusion Rate for the latest year in the model, preserving month and business filters.
+	measure 'SLA Exclusion Rate | Current YTD' =
+			VAR _SelectedYear =
+				SELECTEDVALUE ( Dates[Year] )
+			VAR _CurrentYear =
+				COALESCE (
+					_SelectedYear,
+					CALCULATE (
+						MAX ( Dates[Year] ),
+						REMOVEFILTERS ( Dates )
+					)
+				)
+			RETURN
+				CALCULATE (
+					[SLA Exclusion Rate],
+					REMOVEFILTERS ( Dates[Year] ),
+					Dates[Year] = _CurrentYear
+				)
+		formatString: 0.0%
+		displayFolder: 08. KPI Comparisons\SLA Exclusion Rate
+		lineageTag: 5398c7a4-760b-478c-80db-4c1da6b7c1b0
+
+	/// SLA Exclusion Rate for the prior year using the same selected months, or Jan through the latest current-year month.
+	measure 'SLA Exclusion Rate | Prior YTD' =
+			VAR _SelectedYear =
+				SELECTEDVALUE ( Dates[Year] )
+			VAR _CurrentYear =
+				COALESCE (
+					_SelectedYear,
+					CALCULATE (
+						MAX ( Dates[Year] ),
+						REMOVEFILTERS ( Dates )
+					)
+				)
+			VAR _CurrentMaxMonth =
+				MONTH (
+					CALCULATE (
+						MAX ( Dates[Date] ),
+						REMOVEFILTERS ( Dates ),
+						Dates[Year] = _CurrentYear
+					)
+				)
+			VAR _HasMonthFilter =
+				ISFILTERED ( Dates[Month] )
+					|| ISFILTERED ( Dates[Month Number] )
+			RETURN
+				IF (
+					_HasMonthFilter,
+					CALCULATE (
+						[SLA Exclusion Rate],
+						REMOVEFILTERS ( Dates[Year] ),
+						Dates[Year] = _CurrentYear - 1
+					),
+					CALCULATE (
+						[SLA Exclusion Rate],
+						REMOVEFILTERS ( Dates[Year] ),
+						Dates[Year] = _CurrentYear - 1,
+						KEEPFILTERS ( Dates[Month Number] <= _CurrentMaxMonth )
+					)
+				)
+		formatString: 0.0%
+		displayFolder: 08. KPI Comparisons\SLA Exclusion Rate
+		lineageTag: 9b814b54-f996-412c-bcd4-603a30ff20e3
+
+	/// Year-over-year change for SLA Exclusion Rate in percentage points.
+	measure 'SLA Exclusion Rate | YoY' =
+			VAR _CurrentValue =
+				[SLA Exclusion Rate | Current YTD]
+			VAR _PriorValue =
+				[SLA Exclusion Rate | Prior YTD]
+			RETURN
+				( _CurrentValue - _PriorValue ) * 100
+		formatString: +0.0 "pp";-0.0 "pp";0.0 "pp"
+		displayFolder: 08. KPI Comparisons\SLA Exclusion Rate
+		lineageTag: 4b021fa6-9efd-4466-aada-14ce7ebeacc0
+
+	/// Business definition displayed in report tooltips.
+	measure 'SLA Exclusion Rate | Definition' = "Shipments excluded by governed quality rules divided by all shipments. When one year is selected, it is the current period; with multiple years selected, the latest year is current. Prior YTD uses the same selected months from the preceding year."
+		displayFolder: 08. KPI Comparisons\SLA Exclusion Rate
+		lineageTag: 7dcead10-08a6-4b69-8630-284b87aa4880
+
+	/// Delivered Shipments for the latest year in the model, preserving month and business filters.
+	measure 'Delivered Shipments | Current YTD' =
+			VAR _SelectedYear =
+				SELECTEDVALUE ( Dates[Year] )
+			VAR _CurrentYear =
+				COALESCE (
+					_SelectedYear,
+					CALCULATE (
+						MAX ( Dates[Year] ),
+						REMOVEFILTERS ( Dates )
+					)
+				)
+			RETURN
+				CALCULATE (
+					[Delivered Shipments],
+					REMOVEFILTERS ( Dates[Year] ),
+					Dates[Year] = _CurrentYear
+				)
+		formatString: #,##0
+		displayFolder: 08. KPI Comparisons\Delivered Shipments
+		lineageTag: 2035851f-4695-43a6-8139-a76e4ee90110
+
+	/// Delivered Shipments for the prior year using the same selected months, or Jan through the latest current-year month.
+	measure 'Delivered Shipments | Prior YTD' =
+			VAR _SelectedYear =
+				SELECTEDVALUE ( Dates[Year] )
+			VAR _CurrentYear =
+				COALESCE (
+					_SelectedYear,
+					CALCULATE (
+						MAX ( Dates[Year] ),
+						REMOVEFILTERS ( Dates )
+					)
+				)
+			VAR _CurrentMaxMonth =
+				MONTH (
+					CALCULATE (
+						MAX ( Dates[Date] ),
+						REMOVEFILTERS ( Dates ),
+						Dates[Year] = _CurrentYear
+					)
+				)
+			VAR _HasMonthFilter =
+				ISFILTERED ( Dates[Month] )
+					|| ISFILTERED ( Dates[Month Number] )
+			RETURN
+				IF (
+					_HasMonthFilter,
+					CALCULATE (
+						[Delivered Shipments],
+						REMOVEFILTERS ( Dates[Year] ),
+						Dates[Year] = _CurrentYear - 1
+					),
+					CALCULATE (
+						[Delivered Shipments],
+						REMOVEFILTERS ( Dates[Year] ),
+						Dates[Year] = _CurrentYear - 1,
+						KEEPFILTERS ( Dates[Month Number] <= _CurrentMaxMonth )
+					)
+				)
+		formatString: #,##0
+		displayFolder: 08. KPI Comparisons\Delivered Shipments
+		lineageTag: 3bed8fd3-fd6a-4832-bd3b-56af1c78944b
+
+	/// Year-over-year change for Delivered Shipments.
+	measure 'Delivered Shipments | YoY' =
+			VAR _CurrentValue =
+				[Delivered Shipments | Current YTD]
+			VAR _PriorValue =
+				[Delivered Shipments | Prior YTD]
+			RETURN
+				DIVIDE ( _CurrentValue - _PriorValue, _PriorValue )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 08. KPI Comparisons\Delivered Shipments
+		lineageTag: 4fa20ccd-1cd7-430b-ba24-df8edaf3a7d1
+
+	/// Business definition displayed in report tooltips.
+	measure 'Delivered Shipments | Definition' = "Distinct shipments whose latest operational status is delivered. When one year is selected, it is the current period; with multiple years selected, the latest year is current. Prior YTD uses the same selected months from the preceding year."
+		displayFolder: 08. KPI Comparisons\Delivered Shipments
+		lineageTag: a9e86238-31e0-4637-9f08-2fc52d53aeb1
+
+	/// Open Shipments for the latest year in the model, preserving month and business filters.
+	measure 'Open Shipments | Current YTD' =
+			VAR _SelectedYear =
+				SELECTEDVALUE ( Dates[Year] )
+			VAR _CurrentYear =
+				COALESCE (
+					_SelectedYear,
+					CALCULATE (
+						MAX ( Dates[Year] ),
+						REMOVEFILTERS ( Dates )
+					)
+				)
+			RETURN
+				CALCULATE (
+					[Open Shipments],
+					REMOVEFILTERS ( Dates[Year] ),
+					Dates[Year] = _CurrentYear
+				)
+		formatString: #,##0
+		displayFolder: 08. KPI Comparisons\Open Shipments
+		lineageTag: e3dc8dad-62a5-422c-8dc7-5961df9bbf19
+
+	/// Open Shipments for the prior year using the same selected months, or Jan through the latest current-year month.
+	measure 'Open Shipments | Prior YTD' =
+			VAR _SelectedYear =
+				SELECTEDVALUE ( Dates[Year] )
+			VAR _CurrentYear =
+				COALESCE (
+					_SelectedYear,
+					CALCULATE (
+						MAX ( Dates[Year] ),
+						REMOVEFILTERS ( Dates )
+					)
+				)
+			VAR _CurrentMaxMonth =
+				MONTH (
+					CALCULATE (
+						MAX ( Dates[Date] ),
+						REMOVEFILTERS ( Dates ),
+						Dates[Year] = _CurrentYear
+					)
+				)
+			VAR _HasMonthFilter =
+				ISFILTERED ( Dates[Month] )
+					|| ISFILTERED ( Dates[Month Number] )
+			RETURN
+				IF (
+					_HasMonthFilter,
+					CALCULATE (
+						[Open Shipments],
+						REMOVEFILTERS ( Dates[Year] ),
+						Dates[Year] = _CurrentYear - 1
+					),
+					CALCULATE (
+						[Open Shipments],
+						REMOVEFILTERS ( Dates[Year] ),
+						Dates[Year] = _CurrentYear - 1,
+						KEEPFILTERS ( Dates[Month Number] <= _CurrentMaxMonth )
+					)
+				)
+		formatString: #,##0
+		displayFolder: 08. KPI Comparisons\Open Shipments
+		lineageTag: aa842ebd-c1bd-438a-81ab-241fd088cbf6
+
+	/// Year-over-year change for Open Shipments.
+	measure 'Open Shipments | YoY' =
+			VAR _CurrentValue =
+				[Open Shipments | Current YTD]
+			VAR _PriorValue =
+				[Open Shipments | Prior YTD]
+			RETURN
+				DIVIDE ( _CurrentValue - _PriorValue, _PriorValue )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 08. KPI Comparisons\Open Shipments
+		lineageTag: 945e88e4-b935-4f9e-a280-e7ef80a98495
+
+	/// Business definition displayed in report tooltips.
+	measure 'Open Shipments | Definition' = "Distinct shipments still marked as in transit. When one year is selected, it is the current period; with multiple years selected, the latest year is current. Prior YTD uses the same selected months from the preceding year."
+		displayFolder: 08. KPI Comparisons\Open Shipments
+		lineageTag: 7959f0a9-bddc-46ec-8659-406c12b4a29b
+
+	/// Average Order-to-Ship Hours for the latest year in the model, preserving month and business filters.
+	measure 'Average Order-to-Ship Hours | Current YTD' =
+			VAR _SelectedYear =
+				SELECTEDVALUE ( Dates[Year] )
+			VAR _CurrentYear =
+				COALESCE (
+					_SelectedYear,
+					CALCULATE (
+						MAX ( Dates[Year] ),
+						REMOVEFILTERS ( Dates )
+					)
+				)
+			RETURN
+				CALCULATE (
+					[Average Order-to-Ship Hours],
+					REMOVEFILTERS ( Dates[Year] ),
+					Dates[Year] = _CurrentYear
+				)
+		formatString: #,##0.0
+		displayFolder: 08. KPI Comparisons\Average Order-to-Ship Hours
+		lineageTag: 17b14bbc-c8c1-4e4c-ba73-97fe6fda586a
+
+	/// Average Order-to-Ship Hours for the prior year using the same selected months, or Jan through the latest current-year month.
+	measure 'Average Order-to-Ship Hours | Prior YTD' =
+			VAR _SelectedYear =
+				SELECTEDVALUE ( Dates[Year] )
+			VAR _CurrentYear =
+				COALESCE (
+					_SelectedYear,
+					CALCULATE (
+						MAX ( Dates[Year] ),
+						REMOVEFILTERS ( Dates )
+					)
+				)
+			VAR _CurrentMaxMonth =
+				MONTH (
+					CALCULATE (
+						MAX ( Dates[Date] ),
+						REMOVEFILTERS ( Dates ),
+						Dates[Year] = _CurrentYear
+					)
+				)
+			VAR _HasMonthFilter =
+				ISFILTERED ( Dates[Month] )
+					|| ISFILTERED ( Dates[Month Number] )
+			RETURN
+				IF (
+					_HasMonthFilter,
+					CALCULATE (
+						[Average Order-to-Ship Hours],
+						REMOVEFILTERS ( Dates[Year] ),
+						Dates[Year] = _CurrentYear - 1
+					),
+					CALCULATE (
+						[Average Order-to-Ship Hours],
+						REMOVEFILTERS ( Dates[Year] ),
+						Dates[Year] = _CurrentYear - 1,
+						KEEPFILTERS ( Dates[Month Number] <= _CurrentMaxMonth )
+					)
+				)
+		formatString: #,##0.0
+		displayFolder: 08. KPI Comparisons\Average Order-to-Ship Hours
+		lineageTag: 79e2320f-777e-40a2-8103-5ea20bd99f23
+
+	/// Year-over-year change for Average Order-to-Ship Hours.
+	measure 'Average Order-to-Ship Hours | YoY' =
+			VAR _CurrentValue =
+				[Average Order-to-Ship Hours | Current YTD]
+			VAR _PriorValue =
+				[Average Order-to-Ship Hours | Prior YTD]
+			RETURN
+				DIVIDE ( _CurrentValue - _PriorValue, _PriorValue )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 08. KPI Comparisons\Average Order-to-Ship Hours
+		lineageTag: e03aa318-55cb-4e19-b7f2-d0f84096b641
+
+	/// Business definition displayed in report tooltips.
+	measure 'Average Order-to-Ship Hours | Definition' = "Average elapsed hours between order placement and shipment dispatch. When one year is selected, it is the current period; with multiple years selected, the latest year is current. Prior YTD uses the same selected months from the preceding year."
+		displayFolder: 08. KPI Comparisons\Average Order-to-Ship Hours
+		lineageTag: 07bfd492-cc0c-4fa3-93be-7a94809efd94
+
+	/// Average Ship-to-Delivery Days for the latest year in the model, preserving month and business filters.
+	measure 'Average Ship-to-Delivery Days | Current YTD' =
+			VAR _SelectedYear =
+				SELECTEDVALUE ( Dates[Year] )
+			VAR _CurrentYear =
+				COALESCE (
+					_SelectedYear,
+					CALCULATE (
+						MAX ( Dates[Year] ),
+						REMOVEFILTERS ( Dates )
+					)
+				)
+			RETURN
+				CALCULATE (
+					[Average Ship-to-Delivery Days],
+					REMOVEFILTERS ( Dates[Year] ),
+					Dates[Year] = _CurrentYear
+				)
+		formatString: #,##0.0
+		displayFolder: 08. KPI Comparisons\Average Ship-to-Delivery Days
+		lineageTag: e4def390-b420-4246-b896-f00691d4c2c4
+
+	/// Average Ship-to-Delivery Days for the prior year using the same selected months, or Jan through the latest current-year month.
+	measure 'Average Ship-to-Delivery Days | Prior YTD' =
+			VAR _SelectedYear =
+				SELECTEDVALUE ( Dates[Year] )
+			VAR _CurrentYear =
+				COALESCE (
+					_SelectedYear,
+					CALCULATE (
+						MAX ( Dates[Year] ),
+						REMOVEFILTERS ( Dates )
+					)
+				)
+			VAR _CurrentMaxMonth =
+				MONTH (
+					CALCULATE (
+						MAX ( Dates[Date] ),
+						REMOVEFILTERS ( Dates ),
+						Dates[Year] = _CurrentYear
+					)
+				)
+			VAR _HasMonthFilter =
+				ISFILTERED ( Dates[Month] )
+					|| ISFILTERED ( Dates[Month Number] )
+			RETURN
+				IF (
+					_HasMonthFilter,
+					CALCULATE (
+						[Average Ship-to-Delivery Days],
+						REMOVEFILTERS ( Dates[Year] ),
+						Dates[Year] = _CurrentYear - 1
+					),
+					CALCULATE (
+						[Average Ship-to-Delivery Days],
+						REMOVEFILTERS ( Dates[Year] ),
+						Dates[Year] = _CurrentYear - 1,
+						KEEPFILTERS ( Dates[Month Number] <= _CurrentMaxMonth )
+					)
+				)
+		formatString: #,##0.0
+		displayFolder: 08. KPI Comparisons\Average Ship-to-Delivery Days
+		lineageTag: 2c6722bd-e610-482c-a7ac-10c389922bd5
+
+	/// Year-over-year change for Average Ship-to-Delivery Days.
+	measure 'Average Ship-to-Delivery Days | YoY' =
+			VAR _CurrentValue =
+				[Average Ship-to-Delivery Days | Current YTD]
+			VAR _PriorValue =
+				[Average Ship-to-Delivery Days | Prior YTD]
+			RETURN
+				DIVIDE ( _CurrentValue - _PriorValue, _PriorValue )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 08. KPI Comparisons\Average Ship-to-Delivery Days
+		lineageTag: db3b5647-3d1b-4dc5-908a-b690e72ab6e7
+
+	/// Business definition displayed in report tooltips.
+	measure 'Average Ship-to-Delivery Days | Definition' = "Average elapsed days between shipment dispatch and final delivery. When one year is selected, it is the current period; with multiple years selected, the latest year is current. Prior YTD uses the same selected months from the preceding year."
+		displayFolder: 08. KPI Comparisons\Average Ship-to-Delivery Days
+		lineageTag: a3d5a495-67c3-4776-910f-cd3a1c5512c2
+
+	/// Average Freight per Shipment for the latest year in the model, preserving month and business filters.
+	measure 'Average Freight per Shipment | Current YTD' =
+			VAR _SelectedYear =
+				SELECTEDVALUE ( Dates[Year] )
+			VAR _CurrentYear =
+				COALESCE (
+					_SelectedYear,
+					CALCULATE (
+						MAX ( Dates[Year] ),
+						REMOVEFILTERS ( Dates )
+					)
+				)
+			RETURN
+				CALCULATE (
+					[Average Freight per Shipment],
+					REMOVEFILTERS ( Dates[Year] ),
+					Dates[Year] = _CurrentYear
+				)
+		formatString: "R$" #,##0.00
+		displayFolder: 08. KPI Comparisons\Average Freight per Shipment
+		lineageTag: 196ce2fa-f8f5-433c-b451-84f40fae2f03
+
+	/// Average Freight per Shipment for the prior year using the same selected months, or Jan through the latest current-year month.
+	measure 'Average Freight per Shipment | Prior YTD' =
+			VAR _SelectedYear =
+				SELECTEDVALUE ( Dates[Year] )
+			VAR _CurrentYear =
+				COALESCE (
+					_SelectedYear,
+					CALCULATE (
+						MAX ( Dates[Year] ),
+						REMOVEFILTERS ( Dates )
+					)
+				)
+			VAR _CurrentMaxMonth =
+				MONTH (
+					CALCULATE (
+						MAX ( Dates[Date] ),
+						REMOVEFILTERS ( Dates ),
+						Dates[Year] = _CurrentYear
+					)
+				)
+			VAR _HasMonthFilter =
+				ISFILTERED ( Dates[Month] )
+					|| ISFILTERED ( Dates[Month Number] )
+			RETURN
+				IF (
+					_HasMonthFilter,
+					CALCULATE (
+						[Average Freight per Shipment],
+						REMOVEFILTERS ( Dates[Year] ),
+						Dates[Year] = _CurrentYear - 1
+					),
+					CALCULATE (
+						[Average Freight per Shipment],
+						REMOVEFILTERS ( Dates[Year] ),
+						Dates[Year] = _CurrentYear - 1,
+						KEEPFILTERS ( Dates[Month Number] <= _CurrentMaxMonth )
+					)
+				)
+		formatString: "R$" #,##0.00
+		displayFolder: 08. KPI Comparisons\Average Freight per Shipment
+		lineageTag: c6d69aaf-b475-4d25-8fc1-4c9b8ea02ca9
+
+	/// Year-over-year change for Average Freight per Shipment.
+	measure 'Average Freight per Shipment | YoY' =
+			VAR _CurrentValue =
+				[Average Freight per Shipment | Current YTD]
+			VAR _PriorValue =
+				[Average Freight per Shipment | Prior YTD]
+			RETURN
+				DIVIDE ( _CurrentValue - _PriorValue, _PriorValue )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 08. KPI Comparisons\Average Freight per Shipment
+		lineageTag: fc0a8205-201f-41de-b985-33fadd9abe2b
+
+	/// Business definition displayed in report tooltips.
+	measure 'Average Freight per Shipment | Definition' = "Total freight amount divided by distinct shipments in the selected context. When one year is selected, it is the current period; with multiple years selected, the latest year is current. Prior YTD uses the same selected months from the preceding year."
+		displayFolder: 08. KPI Comparisons\Average Freight per Shipment
+		lineageTag: aec002a3-a264-4271-93c0-31666a7a65da
+
+	/// Exception Rate for the latest year in the model, preserving month and business filters.
+	measure 'Exception Rate | Current YTD' =
+			VAR _SelectedYear =
+				SELECTEDVALUE ( Dates[Year] )
+			VAR _CurrentYear =
+				COALESCE (
+					_SelectedYear,
+					CALCULATE (
+						MAX ( Dates[Year] ),
+						REMOVEFILTERS ( Dates )
+					)
+				)
+			RETURN
+				CALCULATE (
+					[Exception Rate],
+					REMOVEFILTERS ( Dates[Year] ),
+					Dates[Year] = _CurrentYear
+				)
+		formatString: 0.0%
+		displayFolder: 08. KPI Comparisons\Exception Rate
+		lineageTag: 8f29b594-0f4a-4e91-b95d-51b780fcb871
+
+	/// Exception Rate for the prior year using the same selected months, or Jan through the latest current-year month.
+	measure 'Exception Rate | Prior YTD' =
+			VAR _SelectedYear =
+				SELECTEDVALUE ( Dates[Year] )
+			VAR _CurrentYear =
+				COALESCE (
+					_SelectedYear,
+					CALCULATE (
+						MAX ( Dates[Year] ),
+						REMOVEFILTERS ( Dates )
+					)
+				)
+			VAR _CurrentMaxMonth =
+				MONTH (
+					CALCULATE (
+						MAX ( Dates[Date] ),
+						REMOVEFILTERS ( Dates ),
+						Dates[Year] = _CurrentYear
+					)
+				)
+			VAR _HasMonthFilter =
+				ISFILTERED ( Dates[Month] )
+					|| ISFILTERED ( Dates[Month Number] )
+			RETURN
+				IF (
+					_HasMonthFilter,
+					CALCULATE (
+						[Exception Rate],
+						REMOVEFILTERS ( Dates[Year] ),
+						Dates[Year] = _CurrentYear - 1
+					),
+					CALCULATE (
+						[Exception Rate],
+						REMOVEFILTERS ( Dates[Year] ),
+						Dates[Year] = _CurrentYear - 1,
+						KEEPFILTERS ( Dates[Month Number] <= _CurrentMaxMonth )
+					)
+				)
+		formatString: 0.0%
+		displayFolder: 08. KPI Comparisons\Exception Rate
+		lineageTag: 7d070b60-ddd8-42bf-8e89-0fcb9e37eb0a
+
+	/// Year-over-year change for Exception Rate in percentage points.
+	measure 'Exception Rate | YoY' =
+			VAR _CurrentValue =
+				[Exception Rate | Current YTD]
+			VAR _PriorValue =
+				[Exception Rate | Prior YTD]
+			RETURN
+				( _CurrentValue - _PriorValue ) * 100
+		formatString: +0.0 "pp";-0.0 "pp";0.0 "pp"
+		displayFolder: 08. KPI Comparisons\Exception Rate
+		lineageTag: c680bdda-7174-4032-9bf8-be0cfc3893ff
+
+	/// Business definition displayed in report tooltips.
+	measure 'Exception Rate | Definition' = "Shipments with at least one recorded exception divided by all shipments. When one year is selected, it is the current period; with multiple years selected, the latest year is current. Prior YTD uses the same selected months from the preceding year."
+		displayFolder: 08. KPI Comparisons\Exception Rate
+		lineageTag: c1fe225f-0080-4543-b686-9c5fef09799f
+
+	/// Shipments with Exceptions for the latest year in the model, preserving month and business filters.
+	measure 'Shipments with Exceptions | Current YTD' =
+			VAR _SelectedYear =
+				SELECTEDVALUE ( Dates[Year] )
+			VAR _CurrentYear =
+				COALESCE (
+					_SelectedYear,
+					CALCULATE (
+						MAX ( Dates[Year] ),
+						REMOVEFILTERS ( Dates )
+					)
+				)
+			RETURN
+				CALCULATE (
+					[Shipments with Exceptions],
+					REMOVEFILTERS ( Dates[Year] ),
+					Dates[Year] = _CurrentYear
+				)
+		formatString: #,##0
+		displayFolder: 08. KPI Comparisons\Shipments with Exceptions
+		lineageTag: 65500e65-c24b-460a-916a-9047641b082a
+
+	/// Shipments with Exceptions for the prior year using the same selected months, or Jan through the latest current-year month.
+	measure 'Shipments with Exceptions | Prior YTD' =
+			VAR _SelectedYear =
+				SELECTEDVALUE ( Dates[Year] )
+			VAR _CurrentYear =
+				COALESCE (
+					_SelectedYear,
+					CALCULATE (
+						MAX ( Dates[Year] ),
+						REMOVEFILTERS ( Dates )
+					)
+				)
+			VAR _CurrentMaxMonth =
+				MONTH (
+					CALCULATE (
+						MAX ( Dates[Date] ),
+						REMOVEFILTERS ( Dates ),
+						Dates[Year] = _CurrentYear
+					)
+				)
+			VAR _HasMonthFilter =
+				ISFILTERED ( Dates[Month] )
+					|| ISFILTERED ( Dates[Month Number] )
+			RETURN
+				IF (
+					_HasMonthFilter,
+					CALCULATE (
+						[Shipments with Exceptions],
+						REMOVEFILTERS ( Dates[Year] ),
+						Dates[Year] = _CurrentYear - 1
+					),
+					CALCULATE (
+						[Shipments with Exceptions],
+						REMOVEFILTERS ( Dates[Year] ),
+						Dates[Year] = _CurrentYear - 1,
+						KEEPFILTERS ( Dates[Month Number] <= _CurrentMaxMonth )
+					)
+				)
+		formatString: #,##0
+		displayFolder: 08. KPI Comparisons\Shipments with Exceptions
+		lineageTag: d938e4f5-c76b-4e5b-ab84-8d1816ca1efc
+
+	/// Year-over-year change for Shipments with Exceptions.
+	measure 'Shipments with Exceptions | YoY' =
+			VAR _CurrentValue =
+				[Shipments with Exceptions | Current YTD]
+			VAR _PriorValue =
+				[Shipments with Exceptions | Prior YTD]
+			RETURN
+				DIVIDE ( _CurrentValue - _PriorValue, _PriorValue )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 08. KPI Comparisons\Shipments with Exceptions
+		lineageTag: 6406f0ac-6b06-4b54-a975-a38e18fdef62
+
+	/// Business definition displayed in report tooltips.
+	measure 'Shipments with Exceptions | Definition' = "Distinct shipments with at least one exception event. When one year is selected, it is the current period; with multiple years selected, the latest year is current. Prior YTD uses the same selected months from the preceding year."
+		displayFolder: 08. KPI Comparisons\Shipments with Exceptions
+		lineageTag: 55326d23-c70b-479a-a58b-8236c880c26a
+
+	/// First-Attempt Success Rate for the latest year in the model, preserving month and business filters.
+	measure 'First-Attempt Success Rate | Current YTD' =
+			VAR _SelectedYear =
+				SELECTEDVALUE ( Dates[Year] )
+			VAR _CurrentYear =
+				COALESCE (
+					_SelectedYear,
+					CALCULATE (
+						MAX ( Dates[Year] ),
+						REMOVEFILTERS ( Dates )
+					)
+				)
+			RETURN
+				CALCULATE (
+					[First-Attempt Success Rate],
+					REMOVEFILTERS ( Dates[Year] ),
+					Dates[Year] = _CurrentYear
+				)
+		formatString: 0.0%
+		displayFolder: 08. KPI Comparisons\First-Attempt Success Rate
+		lineageTag: 8b4f5d60-5628-4c99-a540-96888bb97998
+
+	/// First-Attempt Success Rate for the prior year using the same selected months, or Jan through the latest current-year month.
+	measure 'First-Attempt Success Rate | Prior YTD' =
+			VAR _SelectedYear =
+				SELECTEDVALUE ( Dates[Year] )
+			VAR _CurrentYear =
+				COALESCE (
+					_SelectedYear,
+					CALCULATE (
+						MAX ( Dates[Year] ),
+						REMOVEFILTERS ( Dates )
+					)
+				)
+			VAR _CurrentMaxMonth =
+				MONTH (
+					CALCULATE (
+						MAX ( Dates[Date] ),
+						REMOVEFILTERS ( Dates ),
+						Dates[Year] = _CurrentYear
+					)
+				)
+			VAR _HasMonthFilter =
+				ISFILTERED ( Dates[Month] )
+					|| ISFILTERED ( Dates[Month Number] )
+			RETURN
+				IF (
+					_HasMonthFilter,
+					CALCULATE (
+						[First-Attempt Success Rate],
+						REMOVEFILTERS ( Dates[Year] ),
+						Dates[Year] = _CurrentYear - 1
+					),
+					CALCULATE (
+						[First-Attempt Success Rate],
+						REMOVEFILTERS ( Dates[Year] ),
+						Dates[Year] = _CurrentYear - 1,
+						KEEPFILTERS ( Dates[Month Number] <= _CurrentMaxMonth )
+					)
+				)
+		formatString: 0.0%
+		displayFolder: 08. KPI Comparisons\First-Attempt Success Rate
+		lineageTag: d4c28283-7657-4aaf-85ea-796029e30b51
+
+	/// Year-over-year change for First-Attempt Success Rate in percentage points.
+	measure 'First-Attempt Success Rate | YoY' =
+			VAR _CurrentValue =
+				[First-Attempt Success Rate | Current YTD]
+			VAR _PriorValue =
+				[First-Attempt Success Rate | Prior YTD]
+			RETURN
+				( _CurrentValue - _PriorValue ) * 100
+		formatString: +0.0 "pp";-0.0 "pp";0.0 "pp"
+		displayFolder: 08. KPI Comparisons\First-Attempt Success Rate
+		lineageTag: 7abfd713-e335-4077-8816-d5307481a0db
+
+	/// Business definition displayed in report tooltips.
+	measure 'First-Attempt Success Rate | Definition' = "Delivered shipments completed on the first attempt divided by all delivered shipments. When one year is selected, it is the current period; with multiple years selected, the latest year is current. Prior YTD uses the same selected months from the preceding year."
+		displayFolder: 08. KPI Comparisons\First-Attempt Success Rate
+		lineageTag: 46cd6db0-2f71-4ea4-9239-037fb2f5efb9
+
+	/// P90 Delivery Delay for the latest year in the model, preserving month and business filters.
+	measure 'P90 Delivery Delay | Current YTD' =
+			VAR _SelectedYear =
+				SELECTEDVALUE ( Dates[Year] )
+			VAR _CurrentYear =
+				COALESCE (
+					_SelectedYear,
+					CALCULATE (
+						MAX ( Dates[Year] ),
+						REMOVEFILTERS ( Dates )
+					)
+				)
+			RETURN
+				CALCULATE (
+					[P90 Delivery Delay],
+					REMOVEFILTERS ( Dates[Year] ),
+					Dates[Year] = _CurrentYear
+				)
+		formatString: #,##0.0
+		displayFolder: 08. KPI Comparisons\P90 Delivery Delay
+		lineageTag: c9ffacf2-c565-4ecd-8363-d594a94348b5
+
+	/// P90 Delivery Delay for the prior year using the same selected months, or Jan through the latest current-year month.
+	measure 'P90 Delivery Delay | Prior YTD' =
+			VAR _SelectedYear =
+				SELECTEDVALUE ( Dates[Year] )
+			VAR _CurrentYear =
+				COALESCE (
+					_SelectedYear,
+					CALCULATE (
+						MAX ( Dates[Year] ),
+						REMOVEFILTERS ( Dates )
+					)
+				)
+			VAR _CurrentMaxMonth =
+				MONTH (
+					CALCULATE (
+						MAX ( Dates[Date] ),
+						REMOVEFILTERS ( Dates ),
+						Dates[Year] = _CurrentYear
+					)
+				)
+			VAR _HasMonthFilter =
+				ISFILTERED ( Dates[Month] )
+					|| ISFILTERED ( Dates[Month Number] )
+			RETURN
+				IF (
+					_HasMonthFilter,
+					CALCULATE (
+						[P90 Delivery Delay],
+						REMOVEFILTERS ( Dates[Year] ),
+						Dates[Year] = _CurrentYear - 1
+					),
+					CALCULATE (
+						[P90 Delivery Delay],
+						REMOVEFILTERS ( Dates[Year] ),
+						Dates[Year] = _CurrentYear - 1,
+						KEEPFILTERS ( Dates[Month Number] <= _CurrentMaxMonth )
+					)
+				)
+		formatString: #,##0.0
+		displayFolder: 08. KPI Comparisons\P90 Delivery Delay
+		lineageTag: 417d0c78-2285-4869-b59a-89b4bb1096f3
+
+	/// Year-over-year change for P90 Delivery Delay.
+	measure 'P90 Delivery Delay | YoY' =
+			VAR _CurrentValue =
+				[P90 Delivery Delay | Current YTD]
+			VAR _PriorValue =
+				[P90 Delivery Delay | Prior YTD]
+			RETURN
+				DIVIDE ( _CurrentValue - _PriorValue, _PriorValue )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 08. KPI Comparisons\P90 Delivery Delay
+		lineageTag: 2e4e286c-4e6b-49b5-9ef5-29684df76217
+
+	/// Business definition displayed in report tooltips.
+	measure 'P90 Delivery Delay | Definition' = "The 90th percentile of positive delivery delay in days among late, SLA-eligible shipments. When one year is selected, it is the current period; with multiple years selected, the latest year is current. Prior YTD uses the same selected months from the preceding year."
+		displayFolder: 08. KPI Comparisons\P90 Delivery Delay
+		lineageTag: 3ae611db-2c2a-46e3-8b70-554dc5165bd0
+
+	/// Excluded from SLA for the latest year in the model, preserving month and business filters.
+	measure 'Excluded from SLA | Current YTD' =
+			VAR _SelectedYear =
+				SELECTEDVALUE ( Dates[Year] )
+			VAR _CurrentYear =
+				COALESCE (
+					_SelectedYear,
+					CALCULATE (
+						MAX ( Dates[Year] ),
+						REMOVEFILTERS ( Dates )
+					)
+				)
+			RETURN
+				CALCULATE (
+					[Excluded from SLA],
+					REMOVEFILTERS ( Dates[Year] ),
+					Dates[Year] = _CurrentYear
+				)
+		formatString: #,##0
+		displayFolder: 08. KPI Comparisons\Excluded from SLA
+		lineageTag: 7ee43294-62ba-497d-a775-023682c2f9b9
+
+	/// Excluded from SLA for the prior year using the same selected months, or Jan through the latest current-year month.
+	measure 'Excluded from SLA | Prior YTD' =
+			VAR _SelectedYear =
+				SELECTEDVALUE ( Dates[Year] )
+			VAR _CurrentYear =
+				COALESCE (
+					_SelectedYear,
+					CALCULATE (
+						MAX ( Dates[Year] ),
+						REMOVEFILTERS ( Dates )
+					)
+				)
+			VAR _CurrentMaxMonth =
+				MONTH (
+					CALCULATE (
+						MAX ( Dates[Date] ),
+						REMOVEFILTERS ( Dates ),
+						Dates[Year] = _CurrentYear
+					)
+				)
+			VAR _HasMonthFilter =
+				ISFILTERED ( Dates[Month] )
+					|| ISFILTERED ( Dates[Month Number] )
+			RETURN
+				IF (
+					_HasMonthFilter,
+					CALCULATE (
+						[Excluded from SLA],
+						REMOVEFILTERS ( Dates[Year] ),
+						Dates[Year] = _CurrentYear - 1
+					),
+					CALCULATE (
+						[Excluded from SLA],
+						REMOVEFILTERS ( Dates[Year] ),
+						Dates[Year] = _CurrentYear - 1,
+						KEEPFILTERS ( Dates[Month Number] <= _CurrentMaxMonth )
+					)
+				)
+		formatString: #,##0
+		displayFolder: 08. KPI Comparisons\Excluded from SLA
+		lineageTag: 94c3df9f-6b10-4f0d-bf71-7213c07fc106
+
+	/// Year-over-year change for Excluded from SLA.
+	measure 'Excluded from SLA | YoY' =
+			VAR _CurrentValue =
+				[Excluded from SLA | Current YTD]
+			VAR _PriorValue =
+				[Excluded from SLA | Prior YTD]
+			RETURN
+				DIVIDE ( _CurrentValue - _PriorValue, _PriorValue )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 08. KPI Comparisons\Excluded from SLA
+		lineageTag: 7d1ea14a-f811-46e9-a923-6f214c9e0de1
+
+	/// Business definition displayed in report tooltips.
+	measure 'Excluded from SLA | Definition' = "Distinct shipments removed from SLA calculations by governed quality rules. When one year is selected, it is the current period; with multiple years selected, the latest year is current. Prior YTD uses the same selected months from the preceding year."
+		displayFolder: 08. KPI Comparisons\Excluded from SLA
+		lineageTag: 99d6b0d9-502b-4da2-9cbe-cb840692ba4d
+
+	/// Orphan Shipments for the latest year in the model, preserving month and business filters.
+	measure 'Orphan Shipments | Current YTD' =
+			VAR _SelectedYear =
+				SELECTEDVALUE ( Dates[Year] )
+			VAR _CurrentYear =
+				COALESCE (
+					_SelectedYear,
+					CALCULATE (
+						MAX ( Dates[Year] ),
+						REMOVEFILTERS ( Dates )
+					)
+				)
+			RETURN
+				CALCULATE (
+					[Orphan Shipments],
+					REMOVEFILTERS ( Dates[Year] ),
+					Dates[Year] = _CurrentYear
+				)
+		formatString: #,##0
+		displayFolder: 08. KPI Comparisons\Orphan Shipments
+		lineageTag: 4760f83d-19cd-448a-8aab-f052b72e489f
+
+	/// Orphan Shipments for the prior year using the same selected months, or Jan through the latest current-year month.
+	measure 'Orphan Shipments | Prior YTD' =
+			VAR _SelectedYear =
+				SELECTEDVALUE ( Dates[Year] )
+			VAR _CurrentYear =
+				COALESCE (
+					_SelectedYear,
+					CALCULATE (
+						MAX ( Dates[Year] ),
+						REMOVEFILTERS ( Dates )
+					)
+				)
+			VAR _CurrentMaxMonth =
+				MONTH (
+					CALCULATE (
+						MAX ( Dates[Date] ),
+						REMOVEFILTERS ( Dates ),
+						Dates[Year] = _CurrentYear
+					)
+				)
+			VAR _HasMonthFilter =
+				ISFILTERED ( Dates[Month] )
+					|| ISFILTERED ( Dates[Month Number] )
+			RETURN
+				IF (
+					_HasMonthFilter,
+					CALCULATE (
+						[Orphan Shipments],
+						REMOVEFILTERS ( Dates[Year] ),
+						Dates[Year] = _CurrentYear - 1
+					),
+					CALCULATE (
+						[Orphan Shipments],
+						REMOVEFILTERS ( Dates[Year] ),
+						Dates[Year] = _CurrentYear - 1,
+						KEEPFILTERS ( Dates[Month Number] <= _CurrentMaxMonth )
+					)
+				)
+		formatString: #,##0
+		displayFolder: 08. KPI Comparisons\Orphan Shipments
+		lineageTag: 5edfd620-a92f-4338-8a6e-42665ad1414a
+
+	/// Year-over-year change for Orphan Shipments.
+	measure 'Orphan Shipments | YoY' =
+			VAR _CurrentValue =
+				[Orphan Shipments | Current YTD]
+			VAR _PriorValue =
+				[Orphan Shipments | Prior YTD]
+			RETURN
+				DIVIDE ( _CurrentValue - _PriorValue, _PriorValue )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 08. KPI Comparisons\Orphan Shipments
+		lineageTag: a938dd73-aaf6-4447-82fd-5b0e7961c7c0
+
+	/// Business definition displayed in report tooltips.
+	measure 'Orphan Shipments | Definition' = "Distinct shipments whose source order could not be matched. When one year is selected, it is the current period; with multiple years selected, the latest year is current. Prior YTD uses the same selected months from the preceding year."
+		displayFolder: 08. KPI Comparisons\Orphan Shipments
+		lineageTag: aa10e320-6e92-4496-8c4f-5956c13fa9f8
+
+	/// Unknown Carrier Shipments for the latest year in the model, preserving month and business filters.
+	measure 'Unknown Carrier Shipments | Current YTD' =
+			VAR _SelectedYear =
+				SELECTEDVALUE ( Dates[Year] )
+			VAR _CurrentYear =
+				COALESCE (
+					_SelectedYear,
+					CALCULATE (
+						MAX ( Dates[Year] ),
+						REMOVEFILTERS ( Dates )
+					)
+				)
+			RETURN
+				CALCULATE (
+					[Unknown Carrier Shipments],
+					REMOVEFILTERS ( Dates[Year] ),
+					Dates[Year] = _CurrentYear
+				)
+		formatString: #,##0
+		displayFolder: 08. KPI Comparisons\Unknown Carrier Shipments
+		lineageTag: f4a31cc9-6a2c-43cd-a0ee-5a64b5a1cdee
+
+	/// Unknown Carrier Shipments for the prior year using the same selected months, or Jan through the latest current-year month.
+	measure 'Unknown Carrier Shipments | Prior YTD' =
+			VAR _SelectedYear =
+				SELECTEDVALUE ( Dates[Year] )
+			VAR _CurrentYear =
+				COALESCE (
+					_SelectedYear,
+					CALCULATE (
+						MAX ( Dates[Year] ),
+						REMOVEFILTERS ( Dates )
+					)
+				)
+			VAR _CurrentMaxMonth =
+				MONTH (
+					CALCULATE (
+						MAX ( Dates[Date] ),
+						REMOVEFILTERS ( Dates ),
+						Dates[Year] = _CurrentYear
+					)
+				)
+			VAR _HasMonthFilter =
+				ISFILTERED ( Dates[Month] )
+					|| ISFILTERED ( Dates[Month Number] )
+			RETURN
+				IF (
+					_HasMonthFilter,
+					CALCULATE (
+						[Unknown Carrier Shipments],
+						REMOVEFILTERS ( Dates[Year] ),
+						Dates[Year] = _CurrentYear - 1
+					),
+					CALCULATE (
+						[Unknown Carrier Shipments],
+						REMOVEFILTERS ( Dates[Year] ),
+						Dates[Year] = _CurrentYear - 1,
+						KEEPFILTERS ( Dates[Month Number] <= _CurrentMaxMonth )
+					)
+				)
+		formatString: #,##0
+		displayFolder: 08. KPI Comparisons\Unknown Carrier Shipments
+		lineageTag: edc92912-897b-4699-9c97-2323e8240832
+
+	/// Year-over-year change for Unknown Carrier Shipments.
+	measure 'Unknown Carrier Shipments | YoY' =
+			VAR _CurrentValue =
+				[Unknown Carrier Shipments | Current YTD]
+			VAR _PriorValue =
+				[Unknown Carrier Shipments | Prior YTD]
+			RETURN
+				DIVIDE ( _CurrentValue - _PriorValue, _PriorValue )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 08. KPI Comparisons\Unknown Carrier Shipments
+		lineageTag: 5c4fc2d7-4021-4b7c-a5c5-57ff474d6d1b
+
+	/// Business definition displayed in report tooltips.
+	measure 'Unknown Carrier Shipments | Definition' = "Distinct shipments assigned to the governed unknown-carrier member. When one year is selected, it is the current period; with multiple years selected, the latest year is current. Prior YTD uses the same selected months from the preceding year."
+		displayFolder: 08. KPI Comparisons\Unknown Carrier Shipments
+		lineageTag: 58dd2b5d-2e8b-4f20-a38b-b69e162202d1
+
+	/// Invalid Timeline Shipments for the latest year in the model, preserving month and business filters.
+	measure 'Invalid Timeline Shipments | Current YTD' =
+			VAR _SelectedYear =
+				SELECTEDVALUE ( Dates[Year] )
+			VAR _CurrentYear =
+				COALESCE (
+					_SelectedYear,
+					CALCULATE (
+						MAX ( Dates[Year] ),
+						REMOVEFILTERS ( Dates )
+					)
+				)
+			RETURN
+				CALCULATE (
+					[Invalid Timeline Shipments],
+					REMOVEFILTERS ( Dates[Year] ),
+					Dates[Year] = _CurrentYear
+				)
+		formatString: #,##0
+		displayFolder: 08. KPI Comparisons\Invalid Timeline Shipments
+		lineageTag: 4be5fd4c-519c-45ba-aa82-169cb1b37e2b
+
+	/// Invalid Timeline Shipments for the prior year using the same selected months, or Jan through the latest current-year month.
+	measure 'Invalid Timeline Shipments | Prior YTD' =
+			VAR _SelectedYear =
+				SELECTEDVALUE ( Dates[Year] )
+			VAR _CurrentYear =
+				COALESCE (
+					_SelectedYear,
+					CALCULATE (
+						MAX ( Dates[Year] ),
+						REMOVEFILTERS ( Dates )
+					)
+				)
+			VAR _CurrentMaxMonth =
+				MONTH (
+					CALCULATE (
+						MAX ( Dates[Date] ),
+						REMOVEFILTERS ( Dates ),
+						Dates[Year] = _CurrentYear
+					)
+				)
+			VAR _HasMonthFilter =
+				ISFILTERED ( Dates[Month] )
+					|| ISFILTERED ( Dates[Month Number] )
+			RETURN
+				IF (
+					_HasMonthFilter,
+					CALCULATE (
+						[Invalid Timeline Shipments],
+						REMOVEFILTERS ( Dates[Year] ),
+						Dates[Year] = _CurrentYear - 1
+					),
+					CALCULATE (
+						[Invalid Timeline Shipments],
+						REMOVEFILTERS ( Dates[Year] ),
+						Dates[Year] = _CurrentYear - 1,
+						KEEPFILTERS ( Dates[Month Number] <= _CurrentMaxMonth )
+					)
+				)
+		formatString: #,##0
+		displayFolder: 08. KPI Comparisons\Invalid Timeline Shipments
+		lineageTag: d4f68e4c-2633-4ae4-928f-3f34a1743835
+
+	/// Year-over-year change for Invalid Timeline Shipments.
+	measure 'Invalid Timeline Shipments | YoY' =
+			VAR _CurrentValue =
+				[Invalid Timeline Shipments | Current YTD]
+			VAR _PriorValue =
+				[Invalid Timeline Shipments | Prior YTD]
+			RETURN
+				DIVIDE ( _CurrentValue - _PriorValue, _PriorValue )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 08. KPI Comparisons\Invalid Timeline Shipments
+		lineageTag: 4263f05a-a91e-424b-ae2f-300c78b5b158
+
+	/// Business definition displayed in report tooltips.
+	measure 'Invalid Timeline Shipments | Definition' = "Distinct shipments whose delivery timestamp occurs before shipment dispatch. When one year is selected, it is the current period; with multiple years selected, the latest year is current. Prior YTD uses the same selected months from the preceding year."
+		displayFolder: 08. KPI Comparisons\Invalid Timeline Shipments
+		lineageTag: 8a15243b-9840-44a0-a4f2-1ec40d8e5994
+
+	/// Compact information glyph used by KPI help icons. Hovering the icon exposes the related business-definition measure.
+	measure 'KPI Information Icon' = UNICHAR ( 9432 )
+		displayFolder: 09. Interface
+		lineageTag: 56339235-0a56-42b1-b61b-a81a96a23cde
+
+	column Placeholder
+		isHidden
+		lineageTag: ac798dd8-2bd5-40e7-a63c-0d8a5afb22c5
+		summarizeBy: none
+		sourceColumn: [Placeholder]
+
+	partition _Measures = calculated
+		mode: import
+		source = ROW ( "Placeholder", BLANK () )
+

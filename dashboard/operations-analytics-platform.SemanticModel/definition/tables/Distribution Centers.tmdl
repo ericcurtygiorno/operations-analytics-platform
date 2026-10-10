@@ -1,0 +1,31 @@
+/// Distribution-center reference used for network performance analysis.
+table 'Distribution Centers'
+	lineageTag: 41be79a9-6fdc-48a1-98b1-f86e0434993d
+
+	/// Technical distribution-center relationship key.
+	column 'Distribution Center Key'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		lineageTag: 74520a68-e3c0-48d5-a03a-1cbc7b87bcb5
+		summarizeBy: none
+		sourceColumn: distribution_center_key
+
+	/// Business identifier of the distribution center.
+	column 'Distribution Center'
+		dataType: string
+		lineageTag: 1b03fc0f-4b74-4089-823d-31101f0a90fb
+		summarizeBy: none
+		sourceColumn: distribution_center_id
+
+	partition 'marts dim_distribution_center' = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("localhost:55432", "operations_analytics"),
+				    DistributionCenterDimension = Source{[Schema="marts",Item="dim_distribution_center"]}[Data]
+				in
+				    DistributionCenterDimension
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,24 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmark/2.1.0/schema.json",
+  "displayName": "Reset — Operational Performance",
+  "name": "631c8750ff896dcb9182",
+  "options": {
+    "targetVisualNames": [],
+    "suppressDisplay": true
+  },
+  "explorationState": {
+    "version": "1.0",
+    "activeSection": "34ae84cc38468411a9ef",
+    "filters": {
+      "byExpr": []
+    },
+    "sections": {
+      "34ae84cc38468411a9ef": {
+        "filters": {
+          "byExpr": []
+        },
+        "visualContainers": {}
+      }
+    }
+  }
+}

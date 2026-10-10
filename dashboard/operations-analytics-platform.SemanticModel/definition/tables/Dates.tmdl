@@ -1,0 +1,111 @@
+/// Conformed calendar used by all time-series and period-over-period analysis.
+table Dates
+	lineageTag: c11c9eb3-872d-4284-bdfb-f0198d8dc1c0
+	dataCategory: Time
+
+	/// Integer relationship key in YYYYMMDD format.
+	column 'Date Key'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: ce556c2a-1df1-48a4-af1a-49ec3b5de73f
+		summarizeBy: none
+		sourceColumn: date_key
+
+	/// Calendar date at daily grain.
+	column Date
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: fb808bdb-59c5-4f8c-8e7c-fcb67fcc9031
+		summarizeBy: none
+		sourceColumn: date_day
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	/// Calendar year.
+	column Year
+		dataType: int64
+		formatString: 0
+		lineageTag: e378f72e-916f-4700-b459-e0ae1ab38031
+		summarizeBy: none
+		sourceColumn: year
+
+	/// Calendar quarter number.
+	column Quarter
+		dataType: int64
+		formatString: 0
+		lineageTag: c74d28bf-a8c6-4e7f-9e7e-c41e4c116fd3
+		summarizeBy: none
+		sourceColumn: quarter
+
+	/// Calendar month number used to sort month names.
+	column 'Month Number'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 9e3b9091-8a7e-4fbd-b4ba-39ad7894f02a
+		summarizeBy: none
+		sourceColumn: month_number
+
+	/// Full calendar month name.
+	column Month
+		dataType: string
+		lineageTag: 4459fb89-b8b9-47fd-a6b6-c0e43fe5be7a
+		summarizeBy: none
+		sourceColumn: month_name
+		sortByColumn: 'Month Number'
+
+	/// ISO weekday number used to sort weekday names.
+	column 'ISO Day of Week'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 16803ba6-2f7e-497a-b924-f767645730ec
+		summarizeBy: none
+		sourceColumn: iso_day_of_week
+
+	/// Full weekday name.
+	column 'Day of Week'
+		dataType: string
+		lineageTag: 25f40b44-a4d2-47c2-a976-2537653c27c1
+		summarizeBy: none
+		sourceColumn: day_name
+		sortByColumn: 'ISO Day of Week'
+
+	/// Indicates whether the date falls on Saturday or Sunday.
+	column 'Is Weekend'
+		dataType: boolean
+		lineageTag: ddf8fa33-256a-4506-b7a8-4f9a7c6c0d31
+		summarizeBy: none
+		sourceColumn: is_weekend
+
+	hierarchy Calendar
+		lineageTag: 51a604a7-e20f-4af5-aaee-dce570d5b23c
+
+		level Year
+			lineageTag: a37db8c8-34b9-4f08-92a2-301fe85130eb
+			column: Year
+
+		level Quarter
+			lineageTag: 69eb74d3-e72c-4f9e-afb4-0bd00fbe31b7
+			column: Quarter
+
+		level Month
+			lineageTag: ae1ec16e-5ea0-439e-b9fc-08a3ba028db3
+			column: Month
+
+		level Date
+			lineageTag: 2d0388bb-c895-43dc-a73b-d2953124e140
+			column: Date
+
+	partition 'marts dim_date' = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("localhost:55432", "operations_analytics"),
+				    DateDimension = Source{[Schema="marts",Item="dim_date"]}[Data]
+				in
+				    DateDimension
+
+	annotation PBI_ResultType = Table
+

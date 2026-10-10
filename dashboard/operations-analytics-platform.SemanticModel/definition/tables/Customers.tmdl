@@ -1,0 +1,31 @@
+/// Customer reference at the customer identifier grain.
+table Customers
+	lineageTag: 07ad4b90-5db8-4fc2-b0d1-6308654bdf50
+
+	/// Technical customer relationship key.
+	column 'Customer Key'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		lineageTag: 11e9bd2f-00f9-4168-ba3c-a33e0cb7f3d6
+		summarizeBy: none
+		sourceColumn: customer_key
+
+	/// Source-system customer identifier.
+	column Customer
+		dataType: string
+		lineageTag: 2dbe435f-f0b5-4dae-94f7-527e5c3b5af5
+		summarizeBy: none
+		sourceColumn: customer_id
+
+	partition 'marts dim_customer' = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("localhost:55432", "operations_analytics"),
+				    CustomerDimension = Source{[Schema="marts",Item="dim_customer"]}[Data]
+				in
+				    CustomerDimension
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "operations-analytics-platform"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "4546e79a-26b1-457d-95c8-661dc4aecd74"
+  }
+}

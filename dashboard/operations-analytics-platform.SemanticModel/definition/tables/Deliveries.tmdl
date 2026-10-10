@@ -1,0 +1,299 @@
+/// One row per shipment with lifecycle, SLA, cost, exception, and quality attributes.
+table Deliveries
+	lineageTag: 410b1e6b-05ab-4759-899a-4149df14b7dd
+
+	/// Unique shipment identifier at the table grain.
+	column 'Shipment ID'
+		dataType: string
+		lineageTag: df4990c4-36b3-45d0-9270-02b14f843ed9
+		summarizeBy: none
+		sourceColumn: shipment_id
+
+	/// Source-system order identifier associated with the shipment.
+	column 'Order ID'
+		dataType: string
+		lineageTag: bbd41ec0-348e-41ac-aa46-cd9da3f60e2a
+		summarizeBy: none
+		sourceColumn: order_id
+
+	column 'Customer Key'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		lineageTag: 25a2cc69-6eb7-48fe-ab9a-90f323d20d9e
+		summarizeBy: none
+		sourceColumn: customer_key
+
+	column 'Carrier Key'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		lineageTag: e65a924b-62a4-4a1f-aabc-805e6bda02dc
+		summarizeBy: none
+		sourceColumn: carrier_key
+
+	column 'Distribution Center Key'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		lineageTag: bf463f12-eca7-467a-a5d0-2da8de5b8f64
+		summarizeBy: none
+		sourceColumn: distribution_center_key
+
+	column 'Location Key'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		lineageTag: 7a8c62aa-8e33-4e94-a30c-d84335031fa5
+		summarizeBy: none
+		sourceColumn: location_key
+
+	column 'Service Type Key'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		lineageTag: f4d0b701-7e1f-419a-81f9-e6ac877af3ea
+		summarizeBy: none
+		sourceColumn: service_type_key
+
+	column 'Order Date Key'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 5ea5b062-063d-4597-b7ee-41084b254014
+		summarizeBy: none
+		sourceColumn: order_date_key
+
+	column 'Shipped Date Key'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 9c722b47-7a20-4249-9edb-9ea04be62e9c
+		summarizeBy: none
+		sourceColumn: shipped_date_key
+
+	column 'Promised Delivery Date Key'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 2acf82a6-6846-4a6f-a450-33be72bc508e
+		summarizeBy: none
+		sourceColumn: promised_delivery_date_key
+
+	column 'Delivered Date Key'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 189134c4-b483-4540-99b4-fb7d35bf4591
+		summarizeBy: none
+		sourceColumn: delivered_date_key
+
+	/// Timestamp when the customer order was created.
+	column 'Ordered At'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 47b24318-d349-475d-8400-2d8166b70861
+		summarizeBy: none
+		sourceColumn: order_at
+
+	/// Timestamp when the shipment left the distribution center.
+	column 'Shipped At'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: a7ad5f76-0021-41ff-8436-709d086e0a20
+		summarizeBy: none
+		sourceColumn: shipped_at
+
+	/// Contractual delivery timestamp used to assess SLA performance.
+	column 'Promised Delivery At'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 3c3dd869-5960-4be5-8a4d-1605ccc8da16
+		summarizeBy: none
+		sourceColumn: promised_delivery_at
+
+	/// Actual delivery timestamp when available.
+	column 'Delivered At'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: dcf259a0-6fd5-4b0b-8492-750db172154b
+		summarizeBy: none
+		sourceColumn: delivered_at
+
+	/// Latest operational shipment status.
+	column 'Delivery Status'
+		dataType: string
+		lineageTag: 3c8e56c0-53cd-4658-9e9f-7af22cfdb8b5
+		summarizeBy: none
+		sourceColumn: delivery_status
+
+	/// Number of delivery attempts recorded for the shipment.
+	column 'Delivery Attempts'
+		dataType: int64
+		formatString: 0
+		lineageTag: ce1c356e-17cb-4d93-90b1-205249ae440b
+		summarizeBy: none
+		sourceColumn: delivery_attempts
+
+	/// Number of units contained in the shipment.
+	column Quantity
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 01b36f1c-c3eb-44eb-a2d5-08e803d1863a
+		summarizeBy: none
+		sourceColumn: quantity
+
+	/// Shipment weight in kilograms.
+	column 'Weight (kg)'
+		dataType: double
+		isHidden
+		formatString: #,##0.0
+		lineageTag: 52cd5b08-c09b-45a8-8b7d-ff41f82da5ed
+		summarizeBy: none
+		sourceColumn: weight_kg
+
+	/// Freight amount associated with the shipment.
+	column 'Freight Amount'
+		dataType: double
+		isHidden
+		formatString: "R$" #,##0.00
+		lineageTag: 65ad732b-d131-440a-aa24-b6220976ab8b
+		summarizeBy: none
+		sourceColumn: freight_amount
+
+	/// Number of tracking events recorded for the shipment.
+	column 'Event Count'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: fefa6117-605d-4344-b9a6-6fc1bd430635
+		summarizeBy: none
+		sourceColumn: event_count
+
+	/// Number of exception events recorded for the shipment.
+	column 'Exception Count'
+		dataType: int64
+		formatString: 0
+		lineageTag: 8d8b60eb-8e18-4a4f-af5c-89f73650daad
+		summarizeBy: none
+		sourceColumn: exception_count
+
+	/// Most recent operational failure category, when present.
+	column 'Failure Reason'
+		dataType: string
+		lineageTag: 851f547f-a618-450c-9050-fabae6571ab6
+		summarizeBy: none
+		sourceColumn: failure_reason
+
+	/// Elapsed hours from order creation to shipment dispatch.
+	column 'Order-to-Ship Hours'
+		dataType: double
+		isHidden
+		formatString: #,##0.0
+		lineageTag: 6ad9671a-e12b-4b7c-b52a-28eaab3b85d1
+		summarizeBy: none
+		sourceColumn: order_to_ship_hours
+
+	/// Elapsed hours from shipment dispatch to delivery.
+	column 'Ship-to-Delivery Hours'
+		dataType: double
+		isHidden
+		formatString: #,##0.0
+		lineageTag: 0e6eb000-207f-40c9-b423-44d7717797c5
+		summarizeBy: none
+		sourceColumn: ship_to_delivery_hours
+
+	/// Signed difference in days between actual and promised delivery.
+	column 'Delivery Delay Days'
+		dataType: double
+		formatString: #,##0.0
+		lineageTag: ca339473-1b75-44bc-bc00-27e6f46331a8
+		summarizeBy: none
+		sourceColumn: delivery_delay_days
+
+	/// True when a valid shipment was delivered on or before promise.
+	column 'Is On Time'
+		dataType: boolean
+		lineageTag: 11e2cba7-f377-4ced-abf6-446eac76efbe
+		summarizeBy: none
+		sourceColumn: is_on_time
+
+	/// True when the shipment passes all rules required for the SLA denominator.
+	column 'Is Valid for SLA'
+		dataType: boolean
+		lineageTag: 0115e185-ac36-48aa-9c33-3be248c0c31b
+		summarizeBy: none
+		sourceColumn: is_valid_for_sla
+
+	/// True when no valid source order could be matched.
+	column 'Is Orphan Order'
+		dataType: boolean
+		lineageTag: 6582b3a5-ebb2-4faa-b892-2897114abcf2
+		summarizeBy: none
+		sourceColumn: is_orphan_order
+
+	/// True when the shipment uses the governed unknown carrier member.
+	column 'Is Unknown Carrier'
+		dataType: boolean
+		lineageTag: 03193f8e-5921-460f-b2fa-4f9e5101a270
+		summarizeBy: none
+		sourceColumn: is_unknown_carrier
+
+	/// True when the delivery timestamp precedes the shipment timestamp.
+	column 'Is Delivery Before Shipment'
+		dataType: boolean
+		lineageTag: 69ad2a62-73c9-4a3d-99d4-cc648419a471
+		summarizeBy: none
+		sourceColumn: is_delivery_before_shipment
+
+	/// True when a delivered status has no delivery timestamp.
+	column 'Is Delivered Without Timestamp'
+		dataType: boolean
+		lineageTag: 6e9d03af-0800-46a1-a70a-0f6727d60645
+		summarizeBy: none
+		sourceColumn: is_delivered_without_timestamp
+
+	/// True when the source order contains an upstream validity defect.
+	column 'Has Invalid Order'
+		dataType: boolean
+		lineageTag: 1df80a3b-533f-4a0a-9859-4f7845c90492
+		summarizeBy: none
+		sourceColumn: has_invalid_order
+
+	column 'Source Batch ID'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		lineageTag: d92fabd7-7bc0-4e16-b267-9c775cd7560d
+		summarizeBy: none
+		sourceColumn: source_batch_id
+
+	column 'Load ID'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		lineageTag: 0096c17f-aee2-4241-9f39-901bc39828d5
+		summarizeBy: none
+		sourceColumn: _load_id
+
+	column 'Ingested At'
+		dataType: dateTime
+		isHidden
+		formatString: General Date
+		isAvailableInMdx: false
+		lineageTag: b58d6976-fa50-4720-ba7e-4304a091b52b
+		summarizeBy: none
+		sourceColumn: _ingested_at
+
+	partition 'marts fact_deliveries' = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("localhost:55432", "operations_analytics"),
+				    DeliveryFact = Source{[Schema="marts",Item="fact_deliveries"]}[Data]
+				in
+				    DeliveryFact
+
+	annotation PBI_ResultType = Table
+

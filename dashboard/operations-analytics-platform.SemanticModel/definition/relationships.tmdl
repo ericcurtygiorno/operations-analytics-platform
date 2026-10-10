@@ -1,0 +1,39 @@
+relationship 'Deliveries by Promised Date'
+	fromColumn: Deliveries.'Promised Delivery Date Key'
+	toColumn: Dates.'Date Key'
+
+relationship 'Deliveries by Order Date'
+	isActive: false
+	fromColumn: Deliveries.'Order Date Key'
+	toColumn: Dates.'Date Key'
+
+relationship 'Deliveries by Shipped Date'
+	isActive: false
+	fromColumn: Deliveries.'Shipped Date Key'
+	toColumn: Dates.'Date Key'
+
+relationship 'Deliveries by Delivered Date'
+	isActive: false
+	fromColumn: Deliveries.'Delivered Date Key'
+	toColumn: Dates.'Date Key'
+
+relationship 'Deliveries to Carriers'
+	fromColumn: Deliveries.'Carrier Key'
+	toColumn: Carriers.'Carrier Key'
+
+relationship 'Deliveries to Customers'
+	fromColumn: Deliveries.'Customer Key'
+	toColumn: Customers.'Customer Key'
+
+relationship 'Deliveries to Distribution Centers'
+	fromColumn: Deliveries.'Distribution Center Key'
+	toColumn: 'Distribution Centers'.'Distribution Center Key'
+
+relationship 'Deliveries to Locations'
+	fromColumn: Deliveries.'Location Key'
+	toColumn: Locations.'Location Key'
+
+relationship 'Deliveries to Service Types'
+	fromColumn: Deliveries.'Service Type Key'
+	toColumn: 'Service Types'.'Service Type Key'
+
