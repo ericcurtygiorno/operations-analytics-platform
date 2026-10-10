@@ -19,24 +19,23 @@ means implemented and verified; `Pending` is intentionally not presented as comp
 | Validated end-to-end vertical execution | Done | [Validation](validation.md), evidence artifact |
 | Reproducible Docker Compose and setup | Done | `docker-compose.yml`, [setup](setup.md) |
 | Real Airflow DAG with retries and failure handling | Done | [Orchestration](orchestration.md) |
-| Useful executable CI | Done locally | `.github/workflows/ci.yml`; hosted observation pending publication |
+| Useful executable CI | Done | Hosted Python/dbt integration and Airflow contract jobs passed on GitHub Actions |
 | Final Power BI report reviewed | Done | [Dashboard guide](../dashboard/README.md) |
 | Final screenshots | Done | [Static gallery](../dashboard/screenshots) |
 | Recruiter-first technical README | Done | [Repository README](../README.md) |
 | Architecture, model, dictionary, and decisions | Done | [Architecture](architecture.md), [ADRs](decisions/README.md) |
 | 60–90 second video | Deferred | Owner requested one recording batch after the full portfolio is complete |
-| Accessible dashboard or clear static alternative | Ready locally | Static gallery exists; public accessibility depends on repository publication |
-| Public, organized, pinned GitHub repository | Pending | Requires publication and profile action |
+| Accessible dashboard or clear static alternative | Done | [Public static gallery](https://github.com/ericcurtygiorno/operations-analytics-platform/tree/main/dashboard/screenshots) |
+| Public, organized, pinned GitHub repository | Partially done | [Repository is public](https://github.com/ericcurtygiorno/operations-analytics-platform); profile pin remains |
 | Project page in the portfolio showcase | Pending | Scheduled for the final showcase stage |
-| All documented commands validated in a clean environment | Partially done | Clean container pipeline and local Airflow validation passed; final publication smoke test remains |
+| All documented commands validated in a clean environment | Done | Clean container pipeline, Airflow validation, and hosted clean-checkout CI passed |
 
 ## Remaining closure sequence
 
 1. Review the scenario and business rules with the portfolio owner.
-2. Publish the repository, observe hosted CI, and pin it on the GitHub profile.
+2. Pin the published repository on the GitHub profile.
 3. Add the project to the portfolio showcase and verify all public links.
-4. Run the final clean-environment smoke test from the published instructions.
-5. Record the walkthrough with the other portfolio videos.
+4. Record the walkthrough with the other portfolio videos.
 
 Until those actions are complete, the project is technically mature but is not marked fully
 complete under the portfolio baseline.

@@ -3,6 +3,7 @@
 > A reproducible logistics analytics platform that turns governed shipment data into operational decisions.
 
 [![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)](pyproject.toml)
+[![Project quality checks](https://github.com/ericcurtygiorno/operations-analytics-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/ericcurtygiorno/operations-analytics-platform/actions/workflows/ci.yml)
 [![dbt](https://img.shields.io/badge/dbt-Core%201.12-FF694B?logo=dbt&logoColor=white)](dbt_project.yml)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-4169E1?logo=postgresql&logoColor=white)](docker-compose.yml)
 [![Airflow](https://img.shields.io/badge/Airflow-3.3-017CEE?logo=apacheairflow&logoColor=white)](orchestration/dags/operations_analytics_pipeline.py)
