@@ -30,7 +30,8 @@ five-page Power BI control tower.
 [Open the Power BI project](dashboard/operations-analytics-platform.pbip) ·
 [Browse dashboard screenshots](dashboard/screenshots) ·
 [Read the technical documentation](docs/architecture.md) ·
-[Review the evidence](artifacts/evidence/stage-1-3-evidence.json)
+[Review the evidence](artifacts/evidence/stage-1-3-evidence.json) ·
+[Visit the portfolio showcase](https://ericcurtygiorno.github.io/)
 
 The 60–90 second walkthrough will be recorded with the other portfolio videos during the final
 showcase phase.

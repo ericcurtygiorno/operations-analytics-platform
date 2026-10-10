@@ -26,16 +26,13 @@ means implemented and verified; `Pending` is intentionally not presented as comp
 | Architecture, model, dictionary, and decisions | Done | [Architecture](architecture.md), [ADRs](decisions/README.md) |
 | 60–90 second video | Deferred | Owner requested one recording batch after the full portfolio is complete |
 | Accessible dashboard or clear static alternative | Done | [Public static gallery](https://github.com/ericcurtygiorno/operations-analytics-platform/tree/main/dashboard/screenshots) |
-| Public, organized, pinned GitHub repository | Partially done | [Repository is public](https://github.com/ericcurtygiorno/operations-analytics-platform); profile pin remains |
-| Project page in the portfolio showcase | Pending | Scheduled for the final showcase stage |
+| Public, organized, pinned GitHub repository | Done | [Repository is public](https://github.com/ericcurtygiorno/operations-analytics-platform) and verified as pinned on the profile |
+| Project page in the portfolio showcase | Done | [Public GitHub Pages showcase](https://ericcurtygiorno.github.io/) |
 | All documented commands validated in a clean environment | Done | Clean container pipeline, Airflow validation, and hosted clean-checkout CI passed |
 
 ## Remaining closure sequence
 
-1. Review the scenario and business rules with the portfolio owner.
-2. Pin the published repository on the GitHub profile.
-3. Add the project to the portfolio showcase and verify all public links.
-4. Record the walkthrough with the other portfolio videos.
+1. Record the walkthrough with the other portfolio videos during the final recording batch.
 
-Until those actions are complete, the project is technically mature but is not marked fully
-complete under the portfolio baseline.
+The only intentionally deferred completion item is the 60–90 second walkthrough video. All other
+technical, documentation, publication, and showcase criteria are complete.
