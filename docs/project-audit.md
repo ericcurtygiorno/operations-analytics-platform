@@ -25,17 +25,16 @@ means implemented and verified; `Pending` is intentionally not presented as comp
 | Recruiter-first technical README | Done | [Repository README](../README.md) |
 | Architecture, model, dictionary, and decisions | Done | [Architecture](architecture.md), [ADRs](decisions/README.md) |
 | 60–90 second video | Deferred | Owner requested one recording batch after the full portfolio is complete |
-| Accessible dashboard or clear static alternative | Done | [Public static gallery](https://github.com/ericcurtygiorno/operations-analytics-platform/tree/main/dashboard/screenshots) |
+| Accessible dashboard or clear static alternative | Done | [Interactive Power BI report](https://app.powerbi.com/view?r=eyJrIjoiNDg0MTk1ZGQtMjlhZC00YmI0LWE1MjAtZWI2NjQxM2E5Mjg3IiwidCI6ImVmNjE5NmM1LTQ1NTctNGVhMy05YWVjLTI1Mjk1ZWRmODk5YiJ9) and [public static gallery](https://github.com/ericcurtygiorno/operations-analytics-platform/tree/main/dashboard/screenshots) |
 | Public, organized, pinned GitHub repository | Done | [Repository is public](https://github.com/ericcurtygiorno/operations-analytics-platform) and verified as pinned on the profile |
 | Project page in the portfolio showcase | Done | [Public GitHub Pages showcase](https://ericcurtygiorno.github.io/) |
 | All documented commands validated in a clean environment | Done | Clean container pipeline, Airflow validation, and hosted clean-checkout CI passed |
 
 ## Remaining closure sequence
 
-1. Publish the optional interactive Power BI Service version during the final portfolio release.
-2. Record the walkthrough with the other portfolio videos during the final recording batch.
+1. Record the walkthrough with the other portfolio videos during the final recording batch.
 
-The baseline's accessible-dashboard criterion is satisfied by the public static gallery. The
-interactive Power BI Service version is a deferred enhancement, not a hidden blocker. The only
-deferred mandatory completion item is the 60–90 second walkthrough video; all other technical,
-documentation, publication, and showcase criteria are complete.
+The accessible-dashboard criterion is satisfied by both the interactive Power BI Service report and
+the public static gallery. The only deferred mandatory completion item is the 60–90 second
+walkthrough video; all other technical, documentation, publication, and showcase criteria are
+complete.

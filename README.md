@@ -27,6 +27,7 @@ five-page Power BI control tower.
 | Power BI pages | 5 |
 | Explicit DAX measures | 100 |
 
+[Open the interactive Power BI report](https://app.powerbi.com/view?r=eyJrIjoiNDg0MTk1ZGQtMjlhZC00YmI0LWE1MjAtZWI2NjQxM2E5Mjg3IiwidCI6ImVmNjE5NmM1LTQ1NTctNGVhMy05YWVjLTI1Mjk1ZWRmODk5YiJ9) ·
 [Open the Power BI project](dashboard/operations-analytics-platform.pbip) ·
 [Browse dashboard screenshots](dashboard/screenshots) ·
 [Read the technical documentation](docs/architecture.md) ·
@@ -127,7 +128,7 @@ The PBIP report contains five pages:
 Executive Overview is the landing page. Detail pages are hidden from report tabs and reached through
 the in-report navigation. KPI cards include plain-language calculation tooltips.
 
-[Dashboard guide](dashboard/README.md) · [Static screenshot gallery](dashboard/screenshots)
+[Interactive Power BI report](https://app.powerbi.com/view?r=eyJrIjoiNDg0MTk1ZGQtMjlhZC00YmI0LWE1MjAtZWI2NjQxM2E5Mjg3IiwidCI6ImVmNjE5NmM1LTQ1NTctNGVhMy05YWVjLTI1Mjk1ZWRmODk5YiJ9) · [Dashboard guide](dashboard/README.md) · [Static screenshot gallery](dashboard/screenshots)
 
 ## Run locally
 

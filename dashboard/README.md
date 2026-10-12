@@ -39,9 +39,8 @@ The deterministic report generator is [`build_dashboard.ps1`](build_dashboard.ps
 
 The publication-ready static gallery is stored in [`screenshots`](screenshots). Each image is
 cropped to the report canvas, without Power BI Desktop panes or external canvas glow. Internal
-rendered validation captures are kept out of the public repository. An interactive Power BI
-Service version is intentionally deferred to the final portfolio release, when the walkthrough
-videos and public links will be validated together. Validation completed with:
+rendered validation captures are kept out of the public repository. The five-page report is also
+available as an [interactive public Power BI report](https://app.powerbi.com/view?r=eyJrIjoiNDg0MTk1ZGQtMjlhZC00YmI0LWE1MjAtZWI2NjQxM2E5Mjg3IiwidCI6ImVmNjE5NmM1LTQ1NTctNGVhMy05YWVjLTI1Mjk1ZWRmODk5YiJ9), published using synthetic data only. Validation completed with:
 
 - PBIR structural validation: 0 errors; after Desktop saved the report with schema 2.13.0, the offline validator reported one schema-endpoint reachability warning only;
 - semantic model validation: 8 tables, 100 measures, and 9 relationships;
