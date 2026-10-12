@@ -2,21 +2,21 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/report/3.3.0/schema.json",
   "themeCollection": {
     "baseTheme": {
+      "name": "Fluent2-CY26SU09",
       "reportVersionAtImport": {
         "page": "2.3.1",
         "report": "3.4.0",
         "visual": "2.13.0"
       },
-      "name": "Fluent2-CY26SU09",
       "type": "SharedResources"
     },
     "customTheme": {
-      "reportVersionAtImport": {
-        "page": "2.3.1",
-        "report": "3.4.0",
-        "visual": "2.13.0"
-      },
       "name": "NorthstarCommerce-c26a1006.json",
+      "reportVersionAtImport": {
+        "visual": "2.13.0",
+        "report": "3.4.0",
+        "page": "2.3.1"
+      },
       "type": "RegisteredResources"
     }
   },
@@ -33,38 +33,52 @@
           }
         }
       }
+    ],
+    "outspacePane": [
+      {
+        "properties": {
+          "expanded": {
+            "expr": {
+              "Literal": {
+                "Value": "false"
+              }
+            }
+          }
+        }
+      }
     ]
   },
   "resourcePackages": [
     {
       "name": "SharedResources",
+      "type": "SharedResources",
       "items": [
         {
           "name": "Fluent2-CY26SU09",
           "path": "BaseThemes/Fluent2-CY26SU09.json",
           "type": "BaseTheme"
         }
-      ],
-      "type": "SharedResources"
+      ]
     },
     {
       "name": "RegisteredResources",
+      "type": "RegisteredResources",
       "items": [
         {
           "name": "NorthstarCommerce-c26a1006.json",
           "path": "NorthstarCommerce-c26a1006.json",
           "type": "CustomTheme"
         }
-      ],
-      "type": "RegisteredResources"
+      ]
     }
   ],
   "settings": {
-    "defaultDrillFilterOtherVisuals": true,
     "useStylableVisualContainerHeader": true,
-    "useEnhancedTooltips": true,
-    "useDefaultAggregateDisplayName": true,
+    "exportDataMode": "AllowSummarized",
+    "defaultDrillFilterOtherVisuals": true,
     "allowChangeFilterTypes": true,
-    "exportDataMode": "AllowSummarized"
+    "useEnhancedTooltips": true,
+    "filterPaneHiddenInEditMode": true,
+    "useDefaultAggregateDisplayName": true
   }
 }
